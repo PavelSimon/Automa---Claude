@@ -1,0 +1,29 @@
+from sqlalchemy.ext.asyncio import AsyncSession
+from ..models.audit import AuditLog
+from ..models.user import User
+from fastapi import Request
+from typing import Optional, Dict, Any
+import json
+
+
+async def log_audit_event(
+    session: AsyncSession,
+    user: Optional[User],
+    action: str,
+    resource_type: str,
+    resource_id: Optional[int] = None,
+    details: Optional[Dict[str, Any]] = None,
+    request: Optional[Request] = None
+):
+    audit_log = AuditLog(
+        user_id=user.id if user else None,
+        action=action,
+        resource_type=resource_type,
+        resource_id=resource_id,
+        details_json=details or {},
+        ip_address=request.client.host if request else None,
+        user_agent=request.headers.get("user-agent") if request else None,
+    )
+
+    session.add(audit_log)
+    await session.commit()

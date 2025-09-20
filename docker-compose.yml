@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.backend
+    container_name: automa-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/data:/app/data
+      - ./backend/scripts:/app/scripts
+      - /var/run/docker.sock:/var/run/docker.sock  # For Docker-in-Docker
+    environment:
+      - DATABASE_URL=sqlite+aiosqlite:///./data/automa.db
+      - SECRET_KEY=your-production-secret-key-change-this
+      - CORS_ORIGINS=http://localhost:3000,http://localhost:80
+    networks:
+      - automa-network
+    depends_on:
+      - sandbox-builder
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.frontend
+    container_name: automa-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - automa-network
+
+  sandbox-builder:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.sandbox
+    image: automa-sandbox:latest
+    container_name: automa-sandbox-builder
+    command: "echo 'Sandbox image built'"
+    networks:
+      - automa-network
+
+networks:
+  automa-network:
+    driver: bridge
+
+volumes:
+  automa-data:

@@ -1,0 +1,20 @@
+FROM python:3.13-slim
+
+# Create non-root user for sandbox
+RUN groupadd -r sandbox && useradd -r -g sandbox sandbox
+
+# Install minimal Python packages that might be commonly needed
+RUN pip install --no-cache-dir \
+    requests \
+    beautifulsoup4 \
+    pandas \
+    numpy
+
+# Create working directory
+WORKDIR /app
+
+# Switch to sandbox user
+USER sandbox:sandbox
+
+# Default command - will be overridden
+CMD ["python", "/app/script.py"]
