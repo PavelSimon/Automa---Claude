@@ -2,7 +2,7 @@ from passlib.context import CryptContext
 from fastapi_users.authentication import (
     AuthenticationBackend,
     BearerTransport,
-    JWTAuthentication,
+    JWTStrategy,
 )
 from ..config import settings
 
@@ -10,16 +10,16 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 bearer_transport = BearerTransport(tokenUrl="auth/jwt/login")
 
-jwt_authentication = JWTAuthentication(
-    secret=settings.secret_key,
-    lifetime_seconds=settings.access_token_expire_minutes * 60,
-    tokenUrl="auth/jwt/login",
-)
+def get_jwt_strategy() -> JWTStrategy:
+    return JWTStrategy(
+        secret=settings.secret_key,
+        lifetime_seconds=settings.access_token_expire_minutes * 60,
+    )
 
 auth_backend = AuthenticationBackend(
     name="jwt",
     transport=bearer_transport,
-    get_strategy=lambda: jwt_authentication,
+    get_strategy=get_jwt_strategy,
 )
 
 

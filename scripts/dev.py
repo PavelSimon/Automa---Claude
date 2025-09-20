@@ -9,7 +9,7 @@ from pathlib import Path
 
 def run_backend():
     """Run the backend development server."""
-    print("🚀 Starting Automa backend with uv...")
+    print("Starting Automa backend with uv...")
     subprocess.run([
         "uv", "run", "uvicorn",
         "backend.app.main:app",
@@ -21,17 +21,17 @@ def run_backend():
 
 def run_frontend():
     """Run the frontend development server."""
-    print("🎨 Starting frontend development server...")
+    print("Starting frontend development server...")
     os.chdir("frontend")
     subprocess.run(["npm", "run", "dev"])
 
 
 def install_deps():
     """Install all dependencies."""
-    print("📦 Installing Python dependencies with uv...")
+    print("Installing Python dependencies with uv...")
     subprocess.run(["uv", "sync"])
 
-    print("📦 Installing frontend dependencies...")
+    print("Installing frontend dependencies...")
     os.chdir("frontend")
     subprocess.run(["npm", "install"])
     os.chdir("..")
@@ -39,13 +39,13 @@ def install_deps():
 
 def run_tests():
     """Run all tests."""
-    print("🧪 Running backend tests...")
+    print("Running backend tests...")
     subprocess.run(["uv", "run", "pytest", "backend/tests/"])
 
 
 def lint():
     """Run linting."""
-    print("🔍 Running linting...")
+    print("Running linting...")
     subprocess.run(["uv", "run", "ruff", "check", "backend/"])
 
 
