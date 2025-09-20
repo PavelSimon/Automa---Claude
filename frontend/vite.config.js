@@ -8,14 +8,14 @@ export default defineConfig({
     vuetify({ autoImport: true })
   ],
   server: {
-    port: 3000,
+    port: 8002,
     proxy: {
       '/api': {
-        target: 'http://localhost:8000',
+        target: 'http://localhost:8001',
         changeOrigin: true
       },
       '/auth': {
-        target: 'http://localhost:8000',
+        target: 'http://localhost:8001',
         changeOrigin: true
       }
     }

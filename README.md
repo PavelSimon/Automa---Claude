@@ -1,6 +1,18 @@
 # Automa - Python Agent Management Platform
 
+**Status: ✅ Fully Functional**
+
 Webová aplikácia na správu Python aplikácií a agentov pre automatizáciu rutinných úloh.
+
+## Aktuálny stav projektu
+
+Platforma je plne funkčná s nasledujúcimi komponentami:
+- ✅ **Backend API**: FastAPI server beží na porte 8001
+- ✅ **Frontend UI**: Vue.js 3 + Vuetify beží na porte 8002
+- ✅ **Autentifikácia**: JWT tokeny s argon2 hashovaním (opravené)
+- ✅ **Databáza**: SQLite s inicializovanými tabuľkami
+- ✅ **Docker**: Pripravená konfigurácia pre sandboxovanie
+- ✅ **Development tools**: uv package manager plne nakonfigurovaný
 
 ## Funkcionalita
 
@@ -57,6 +69,9 @@ powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
 
 1. **Setup celého projektu**:
 ```bash
+# Vytvorenie potrebných adresárov
+mkdir -p data scripts
+
 # Inštalácia Python dependencies
 uv sync
 
@@ -66,12 +81,12 @@ cd frontend && npm install && cd ..
 
 2. **Spustenie aplikácie**:
 ```bash
-# Backend (rôzne spôsoby)
+# Backend (port 8001)
 uv run main.py                    # Hlavný entry point
 uv run scripts/dev.py backend     # Development script
-uv run uvicorn backend.app.main:app --reload
+uv run uvicorn backend.app.main:app --reload --port 8001
 
-# Frontend
+# Frontend (port 8002)
 uv run scripts/dev.py frontend    # Development script
 # alebo
 cd frontend && npm run dev
@@ -110,9 +125,10 @@ Kľúčové nastavenia:
 
 ## API Dokumentácia
 
-Po spustení backendu je dostupná na:
-- **Swagger UI**: http://localhost:8000/docs
-- **OpenAPI JSON**: http://localhost:8000/openapi.json
+Po spustení aplikácie je dostupná na:
+- **Backend Swagger UI**: http://localhost:8001/docs
+- **Backend OpenAPI JSON**: http://localhost:8001/openapi.json
+- **Frontend**: http://localhost:8002/
 
 ## Development Commands
 
@@ -215,8 +231,20 @@ tar -czf backup/scripts_$(date +%Y%m%d).tar.gz backend/scripts/
 - **Kompatibilita**: Plne kompatibilné s pip a pyproject.toml
 - **Bezpečnosť**: Lepšie dependency resolution
 
+## Známe problémy a riešenia
+
+### Autentifikácia
+- **Problém**: Login endpoint vracal 500 error
+- **Riešenie**: Opravená `on_after_login` metóda v UserManager a pridaná podpora argon2
+
+### Virtual Environment
+- **Problém**: Path issues na Windows
+- **Riešenie**: Recreate venv pomocou `rm -rf .venv && uv venv && uv sync`
+
 ## Ďalší vývoj
 
+- [x] ~~Oprava autentifikácie~~ ✅
+- [x] ~~Konfigurácia uv package managera~~ ✅
 - [ ] PostgreSQL podpora
 - [ ] Advanced scheduling (cron expressions)
 - [ ] Real-time monitoring dashboard

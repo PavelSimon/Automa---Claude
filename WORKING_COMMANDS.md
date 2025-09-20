@@ -12,8 +12,15 @@ uv sync
 ```bash
 # Všetky tieto príkazy fungujú:
 uv run main.py                                      # Port 8001
-uv run uvicorn backend.app.main:app --reload        # Port 8000
-uv run scripts/dev.py backend                       # Port 8000
+uv run uvicorn backend.app.main:app --reload --port 8001  # Port 8001
+uv run scripts/dev.py backend                       # Port 8001
+```
+
+### Spustenie frontendu
+```bash
+cd frontend && npm run dev                          # Port 8002
+# alebo
+uv run scripts/dev.py frontend                     # Port 8002
 ```
 
 ### Development skripty
@@ -47,9 +54,10 @@ uv run uvicorn automa.api.app:app --reload
 - aiosqlite, aiofiles
 - pytest, ruff, httpx (dev)
 
-## 🎯 API Endpoints
+## 🎯 Endpoints
 
-Po spustení servera:
-- **API docs**: http://localhost:8000/docs
-- **Health check**: http://localhost:8000/health
-- **Root**: http://localhost:8000/
+Po spustení serverov:
+- **Backend API docs**: http://localhost:8001/docs
+- **Backend Health check**: http://localhost:8001/health
+- **Backend Root**: http://localhost:8001/
+- **Frontend**: http://localhost:8002/

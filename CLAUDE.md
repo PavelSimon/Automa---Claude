@@ -22,30 +22,40 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Auditing**: Structured logging to files or database
 - **Frontend**: Simple HTML/CSS/JS dashboard
 
-## Current State
+## Current State ✅
 
 Fully functional Python agent management platform with:
-- **Backend**: FastAPI with SQLAlchemy, JWT authentication, Docker sandboxing
+- **Backend**: FastAPI with SQLAlchemy, JWT authentication (fixed argon2 support), Docker sandboxing
 - **Frontend**: Vue.js 3 with Vuetify, complete UI for scripts/agents/jobs/monitoring
 - **Database**: SQLite with comprehensive models (User, Script, Agent, Job, AuditLog)
-- **Security**: JWT tokens, audit logging, Docker container isolation
-- **API**: Full REST API with OpenAPI documentation
+- **Security**: JWT tokens with argon2 password hashing, audit logging, Docker container isolation
+- **API**: Full REST API with OpenAPI documentation at `/docs`
 - **Docker**: Complete containerization with docker-compose setup
+- **Authentication**: Fixed login issues - now fully working with fastapi-users
 
 ## Development Commands
+
+### Initial Setup
+```bash
+# Create required directories
+mkdir -p data scripts
+
+# Recreate virtual environment (if path issues)
+rm -rf .venv && uv venv && uv sync
+```
 
 ### Backend Development
 ```bash
 # Install dependencies (first time setup)
 uv sync
 
-# Run backend server (development)
-uv run uvicorn backend.app.main:app --reload
+# Run backend server (development) - Port 8001
+uv run uvicorn backend.app.main:app --reload --port 8001
 
-# Run via main.py
+# Run via main.py - Port 8001
 uv run main.py
 
-# Run via development script
+# Run via development script - Port 8001
 uv run scripts/dev.py backend
 ```
 
@@ -54,7 +64,7 @@ uv run scripts/dev.py backend
 # Install dependencies
 cd frontend && npm install
 
-# Run development server
+# Run development server - Port 8002
 npm run dev
 # or via development script
 uv run scripts/dev.py frontend
@@ -114,8 +124,8 @@ Based on project requirements:
 - `models/`: SQLAlchemy database models
 - `schemas/`: Pydantic request/response models
 - `api/`: FastAPI route handlers
-- `services/`: Business logic layer
-- `core/`: Authentication, dependencies, audit utilities
+- `services/`: Business logic layer (including fixed UserManager)
+- `core/`: Authentication (argon2 + bcrypt), dependencies, audit utilities
 - `sandbox/`: Docker-based script execution service
 
 ### Frontend Structure
@@ -125,10 +135,25 @@ Based on project requirements:
 - `router/`: Vue Router configuration
 
 ### Key Features Implemented
-- User registration and JWT authentication
+- User registration and JWT authentication (fixed with proper argon2 support)
 - Script upload and management with file storage
 - Agent creation and lifecycle management
 - Job scheduling (once, interval, cron)
 - Real-time monitoring dashboard
 - Comprehensive audit logging
 - Docker-based sandboxed script execution
+
+## Recent Fixes (2025-09-20)
+
+1. **Authentication System**:
+   - Fixed `on_after_login` method signature in UserManager
+   - Added argon2 support to passlib context
+   - Resolved password verification issues
+
+2. **Development Scripts**:
+   - Fixed `scripts/dev.py` to use proper cwd for frontend commands
+   - No longer uses os.chdir() which caused path issues
+
+3. **Dependencies**:
+   - Updated pyproject.toml to include argon2 support: `passlib[bcrypt,argon2]`
+   - Ensured all required packages are properly installed

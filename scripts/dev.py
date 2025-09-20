@@ -15,15 +15,15 @@ def run_backend():
         "backend.app.main:app",
         "--reload",
         "--host", "0.0.0.0",
-        "--port", "8000"
+        "--port", "8001"
     ])
 
 
 def run_frontend():
     """Run the frontend development server."""
     print("Starting frontend development server...")
-    os.chdir("frontend")
-    subprocess.run(["npm", "run", "dev"])
+    frontend_path = Path(__file__).parent.parent / "frontend"
+    subprocess.run(["npm", "run", "dev"], cwd=frontend_path)
 
 
 def install_deps():
@@ -32,9 +32,8 @@ def install_deps():
     subprocess.run(["uv", "sync"])
 
     print("Installing frontend dependencies...")
-    os.chdir("frontend")
-    subprocess.run(["npm", "install"])
-    os.chdir("..")
+    frontend_path = Path(__file__).parent.parent / "frontend"
+    subprocess.run(["npm", "install"], cwd=frontend_path)
 
 
 def run_tests():

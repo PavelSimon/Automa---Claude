@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     data_directory: str = "./data"
 
     # CORS settings
-    cors_origins: list[str] = ["http://localhost:3000", "http://localhost:8080"]
+    cors_origins: list[str] = ["http://localhost:8002", "http://localhost:8080"]
 
     class Config:
         env_file = ".env"

@@ -1,8 +1,7 @@
-from typing import Optional
-from fastapi import Depends, Request
+from typing import Optional, Any
+from fastapi import Request
 from fastapi_users import BaseUserManager, IntegerIDMixin
 from ..models.user import User
-from ..core.security import get_password_hash, verify_password
 from ..config import settings
 
 
@@ -17,6 +16,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         self,
         user: User,
         request: Optional[Request] = None,
+        response: Optional[Any] = None,
     ):
         print(f"User {user.id} logged in.")
 
@@ -24,9 +24,3 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         self, user: User, token: str, request: Optional[Request] = None
     ):
         print(f"Verification requested for user {user.id}. Token: {token}")
-
-    async def authenticate(self, credentials) -> Optional[User]:
-        user = await self.get_by_email(credentials.username)
-        if user and verify_password(credentials.password, user.hashed_password):
-            return user
-        return None
