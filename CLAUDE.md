@@ -36,25 +36,28 @@ Fully functional Python agent management platform with:
 
 ### Backend Development
 ```bash
-# Install dependencies
-cd backend
-pip install -r requirements.txt
+# Install dependencies (first time setup)
+uv sync
 
 # Run backend server (development)
-uvicorn app.main:app --reload
+uv run uvicorn backend.app.main:app --reload
 
 # Run via main.py
-python main.py
+uv run main.py
+
+# Run via development script
+uv run scripts/dev.py backend
 ```
 
 ### Frontend Development
 ```bash
 # Install dependencies
-cd frontend
-npm install
+cd frontend && npm install
 
 # Run development server
 npm run dev
+# or via development script
+uv run scripts/dev.py frontend
 
 # Build for production
 npm run build
@@ -75,7 +78,13 @@ docker-compose logs -f backend
 ### Testing and Linting
 ```bash
 # Backend tests
-cd backend && pytest
+uv run pytest backend/tests/
+# or via development script
+uv run scripts/dev.py test
+
+# Backend linting
+uv run ruff check backend/
+uv run scripts/dev.py lint
 
 # Frontend linting
 cd frontend && npm run lint
@@ -92,6 +101,7 @@ Based on project requirements:
 ## Development Notes
 
 - **Python Version**: 3.13 (updated from 3.14)
+- **Package Manager**: uv (modern, fast Python package manager)
 - **Architecture**: Modular design with clear separation of concerns
 - **Security**: Docker sandboxing implemented, comprehensive audit trail
 - **Extensibility**: Plugin-ready architecture with service layer pattern

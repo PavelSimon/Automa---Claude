@@ -1,9 +1,9 @@
 def main():
     """Main entry point for the Automa application."""
     import uvicorn
-    from backend.app.main import app
 
     print("Starting Automa - Python Agent Management Platform")
+    print("Using uv for dependency management")
     uvicorn.run(
         "backend.app.main:app",
         host="0.0.0.0",

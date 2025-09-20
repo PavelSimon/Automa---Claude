@@ -1,17 +1,27 @@
 FROM python:3.13-slim
 
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install uv
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+ENV PATH="/root/.cargo/bin:$PATH"
+
 # Create non-root user for sandbox
 RUN groupadd -r sandbox && useradd -r -g sandbox sandbox
 
-# Install minimal Python packages that might be commonly needed
-RUN pip install --no-cache-dir \
-    requests \
-    beautifulsoup4 \
-    pandas \
-    numpy
-
-# Create working directory
+# Create working directory and virtual environment
 WORKDIR /app
+RUN uv venv .venv
+ENV PATH="/app/.venv/bin:$PATH"
+
+# Install minimal Python packages that might be commonly needed
+RUN uv add requests beautifulsoup4 pandas numpy
+
+# Change ownership to sandbox user
+RUN chown -R sandbox:sandbox /app
 
 # Switch to sandbox user
 USER sandbox:sandbox
