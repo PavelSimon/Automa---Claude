@@ -13,9 +13,14 @@ services:
       - ./backend/scripts:/app/scripts
       - /var/run/docker.sock:/var/run/docker.sock  # For Docker-in-Docker
     environment:
-      - DATABASE_URL=sqlite+aiosqlite:///./data/automa.db
-      - SECRET_KEY=your-production-secret-key-change-this
-      - CORS_ORIGINS=http://localhost:3000,http://localhost:80
+      - ENVIRONMENT=${ENVIRONMENT:-development}
+      - DATABASE_URL=${DATABASE_URL:-sqlite+aiosqlite:///./data/automa.db}
+      - SECRET_KEY=${SECRET_KEY}
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000,http://localhost:80}
+      - SANDBOX_IMAGE=${SANDBOX_IMAGE:-automa-sandbox:latest}
+      - SANDBOX_MEMORY_LIMIT=${SANDBOX_MEMORY_LIMIT:-256m}
+      - SANDBOX_CPU_LIMIT=${SANDBOX_CPU_LIMIT:-0.5}
+      - SANDBOX_TIMEOUT=${SANDBOX_TIMEOUT:-300}
     networks:
       - automa-network
     depends_on:
