@@ -172,7 +172,9 @@ class JobService:
             .where(Job.created_by == user.id)\
             .order_by(JobExecution.started_at.desc())\
             .limit(limit)\
-            .options(selectinload(JobExecution.job))
+            .options(
+                selectinload(JobExecution.job).selectinload(Job.agent)
+            )
 
         result = await self.session.execute(query)
         return result.scalars().all()

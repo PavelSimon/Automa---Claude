@@ -47,3 +47,19 @@ class JobExecutionRead(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class JobExecutionWithDetailsRead(BaseModel):
+    id: int
+    job_id: int
+    job_name: Optional[str] = None
+    agent_name: Optional[str] = None
+    started_at: datetime
+    finished_at: Optional[datetime] = None
+    status: str
+    output: Optional[str] = None
+    error_log: Optional[str] = None
+    exit_code: Optional[int] = None
+
+    class Config:
+        from_attributes = True

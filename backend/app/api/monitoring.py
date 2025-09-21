@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from ..database import get_async_session
 from ..models.user import User
-from ..schemas.job import JobExecutionRead
+from ..schemas.job import JobExecutionWithDetailsRead
 from ..services.job_service import JobService
 from ..services.agent_service import AgentService
 from ..services.monitoring_service import MonitoringService
@@ -100,12 +100,31 @@ async def get_dashboard_data(
 
 
 # Alias endpoint for frontend compatibility
-@router.get("/executions/recent", response_model=List[JobExecutionRead])
+@router.get("/executions/recent", response_model=List[JobExecutionWithDetailsRead])
 async def get_recent_executions(
     limit: int = 10,
     session: AsyncSession = Depends(get_async_session),
     current_user: User = Depends(current_active_user),
 ):
-    """Get recent job executions (alias for frontend compatibility)"""
+    """Get recent job executions with job and agent details"""
     job_service = JobService(session)
-    return await job_service.get_recent_executions(current_user, limit)
+    executions = await job_service.get_recent_executions(current_user, limit)
+
+    # Transform to include job and agent names
+    result = []
+    for execution in executions:
+        data = {
+            "id": execution.id,
+            "job_id": execution.job_id,
+            "job_name": execution.job.name if execution.job else "Unknown Job",
+            "agent_name": execution.job.agent.name if execution.job and execution.job.agent else "Unknown Agent",
+            "started_at": execution.started_at,
+            "finished_at": execution.finished_at,
+            "status": execution.status,
+            "output": execution.output,
+            "error_log": execution.error_log,
+            "exit_code": execution.exit_code
+        }
+        result.append(JobExecutionWithDetailsRead(**data))
+
+    return result
