@@ -1,6 +1,6 @@
 import secrets
 from typing import Literal
-from pydantic import validator
+from pydantic import field_validator, ConfigDict
 from pydantic_settings import BaseSettings
 
 
@@ -30,26 +30,27 @@ class Settings(BaseSettings):
     # CORS settings
     cors_origins: list[str] = ["http://localhost:8002", "http://localhost:8080"]
 
-    @validator('secret_key')
-    def validate_secret_key(cls, v, values):
+    @field_validator('secret_key')
+    @classmethod
+    def validate_secret_key(cls, v, info):
         """Ensure secret key is secure for production"""
-        if values.get('environment') == 'production':
+        if hasattr(info, 'data') and info.data.get('environment') == 'production':
             if len(v) < 32:
                 raise ValueError('Secret key must be at least 32 characters for production')
             if v in ['your-secret-key-change-in-production', 'dev-secret-key']:
                 raise ValueError('Must use a secure secret key for production')
         return v
 
-    @validator('cors_origins')
-    def validate_cors_origins(cls, v, values):
+    @field_validator('cors_origins')
+    @classmethod
+    def validate_cors_origins(cls, v, info):
         """Restrict CORS origins in production"""
-        if values.get('environment') == 'production':
+        if hasattr(info, 'data') and info.data.get('environment') == 'production':
             # Remove localhost origins in production
             return [origin for origin in v if not origin.startswith('http://localhost')]
         return v
 
-    class Config:
-        env_file = ".env"
+    model_config = ConfigDict(env_file=".env")
 
 
 settings = Settings()

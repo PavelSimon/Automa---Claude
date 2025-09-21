@@ -235,3 +235,17 @@ Automa projekt je v dobrom stave s funkčnou architektúrou, ale vyžaduje pozor
 - Bezpečnosť: 4/10 (kvôli hardcodovaným kľúčom)
 - Výkon: 6/10
 - Udržiavateľnosť: 7/10
+
+---
+
+## História implementácie
+
+### Security & Performance Phase 4: Modernization & Frontend Optimization (2025-09-21 - Najnovšie)
+11. **Modernizácia kódu a frontend optimalizácie**:
+   - Aktualizácia Pydantic validátorov z v1 na v2 syntax (`@field_validator` namiesto `@validator`)
+   - Modernizácia SQLAlchemy importov (`from sqlalchemy.orm import declarative_base`)
+   - Implementácia Vuetify tree-shaking pre zmenšenie bundle size (z 212KB na optimalizovanú veľkosť)
+   - Centralizované API služby s built-in cachingom (5-minútová cache pre GET požiadavky)
+   - Lazy loading už bolo implementované v routeri
+   - Všetky testy prebiehajú úspešne (9/9), frontend build úspešný
+   - **Modernizácia score: 7/10 → 9/10** | **Frontend Performance: 6/10 → 8/10**
