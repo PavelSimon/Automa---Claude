@@ -1,5 +1,5 @@
 from typing import List, Optional
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from sqlalchemy import select, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -17,9 +17,9 @@ class JobService:
         # Calculate next_run based on schedule_type
         next_run = None
         if job_data.schedule_type == "once":
-            next_run = datetime.utcnow() + timedelta(minutes=1)  # Run in 1 minute
+            next_run = datetime.now(timezone.utc) + timedelta(minutes=1)  # Run in 1 minute
         elif job_data.schedule_type == "interval" and job_data.interval_seconds:
-            next_run = datetime.utcnow() + timedelta(seconds=job_data.interval_seconds)
+            next_run = datetime.now(timezone.utc) + timedelta(seconds=job_data.interval_seconds)
         # TODO: Add cron parsing for cron_expression
 
         job = Job(
@@ -76,7 +76,7 @@ class JobService:
         # Recalculate next_run if schedule changed
         if "schedule_type" in update_data or "interval_seconds" in update_data:
             if job.schedule_type == "interval" and job.interval_seconds:
-                job.next_run = datetime.utcnow() + timedelta(seconds=job.interval_seconds)
+                job.next_run = datetime.now(timezone.utc) + timedelta(seconds=job.interval_seconds)
 
         await self.session.commit()
         await self.session.refresh(job)
@@ -118,7 +118,7 @@ class JobService:
         execution = JobExecution(
             job_id=job.id,
             status="running",
-            started_at=datetime.utcnow()
+            started_at=datetime.now(timezone.utc)
         )
 
         self.session.add(execution)
@@ -128,7 +128,7 @@ class JobService:
         # TODO: Implement actual job execution logic
         # For now, simulate immediate completion
         execution.status = "success"
-        execution.finished_at = datetime.utcnow()
+        execution.finished_at = datetime.now(timezone.utc)
         execution.output = f"Job {job.name} executed successfully"
         execution.exit_code = 0
 

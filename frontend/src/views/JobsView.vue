@@ -152,6 +152,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
+import { formatDate, formatDateTime } from '@/utils/datetime'
 
 const router = useRouter()
 
@@ -311,13 +312,6 @@ const closeDialog = () => {
   }
 }
 
-const formatDate = (dateString) => {
-  return new Date(dateString).toLocaleDateString()
-}
-
-const formatDateTime = (dateString) => {
-  return new Date(dateString).toLocaleString()
-}
 
 onMounted(() => {
   loadJobs()

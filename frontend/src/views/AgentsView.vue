@@ -134,6 +134,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
+import { formatDate } from '@/utils/datetime'
 
 const agents = ref([])
 const scripts = ref([])
@@ -256,9 +257,6 @@ const closeDialog = () => {
   }
 }
 
-const formatDate = (dateString) => {
-  return new Date(dateString).toLocaleDateString()
-}
 
 onMounted(() => {
   loadAgents()

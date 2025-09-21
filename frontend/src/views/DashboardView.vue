@@ -97,6 +97,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
+import { formatRelativeTime } from '@/utils/datetime'
 
 const stats = ref({
   scripts: 0,
@@ -146,7 +147,7 @@ const loadDashboardData = async () => {
       activities.push({
         id: `script-${script.id}`,
         action: `Script "${script.name}" created`,
-        timestamp: formatTimestamp(script.created_at)
+        timestamp: formatRelativeTime(script.created_at)
       })
     })
 
@@ -155,7 +156,7 @@ const loadDashboardData = async () => {
       activities.push({
         id: `agent-${agent.id}`,
         action: `Agent "${agent.name}" ${agent.status}`,
-        timestamp: formatTimestamp(agent.updated_at || agent.created_at)
+        timestamp: formatRelativeTime(agent.updated_at || agent.created_at)
       })
     })
 
@@ -164,7 +165,7 @@ const loadDashboardData = async () => {
       activities.push({
         id: `execution-${execution.id}`,
         action: `Job execution ${execution.status}`,
-        timestamp: formatTimestamp(execution.started_at)
+        timestamp: formatRelativeTime(execution.started_at)
       })
     })
 
@@ -181,22 +182,6 @@ const loadDashboardData = async () => {
   }
 }
 
-const formatTimestamp = (dateString) => {
-  if (!dateString) return 'Unknown'
-
-  const date = new Date(dateString)
-  const now = new Date()
-  const diffMs = now - date
-  const diffMins = Math.floor(diffMs / 60000)
-  const diffHours = Math.floor(diffMins / 60)
-  const diffDays = Math.floor(diffHours / 24)
-
-  if (diffMins < 1) return 'Just now'
-  if (diffMins < 60) return `${diffMins} minutes ago`
-  if (diffHours < 24) return `${diffHours} hours ago`
-  if (diffDays < 7) return `${diffDays} days ago`
-  return date.toLocaleDateString()
-}
 
 onMounted(async () => {
   await loadDashboardData()
