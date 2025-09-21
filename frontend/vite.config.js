@@ -6,7 +6,12 @@ import { fileURLToPath, URL } from 'node:url'
 export default defineConfig({
   plugins: [
     vue(),
-    vuetify({ autoImport: true })
+    vuetify({
+      autoImport: true,
+      theme: {
+        defaultTheme: 'light'
+      }
+    })
   ],
   resolve: {
     alias: {
@@ -25,5 +30,20 @@ export default defineConfig({
         changeOrigin: true
       }
     }
+  },
+  build: {
+    target: 'esnext',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vue-vendor': ['vue', 'vue-router', 'pinia'],
+          'vuetify-vendor': ['vuetify'],
+          'utils': ['axios']
+        }
+      }
+    }
+  },
+  esbuild: {
+    target: 'esnext'
   }
 })
