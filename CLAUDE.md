@@ -166,6 +166,7 @@ Based on project requirements:
    - Added drawer state management with authentication watching
    - Fixed authentication initialization on app startup
    - Resolved 307 redirects by adding trailing slashes to API endpoints
+   - Fixed 422 validation errors by simplifying script creation API to use JSON
 
 5. **Dependencies**:
    - Added psutil for system monitoring

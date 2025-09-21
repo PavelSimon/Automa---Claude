@@ -14,11 +14,24 @@ router = APIRouter(prefix="/scripts", tags=["scripts"])
 async def create_script(
     script: ScriptCreate,
     session: AsyncSession = Depends(get_async_session),
-    current_user: User = Depends(current_active_user),
-    file: UploadFile = File(None)
+    current_user: User = Depends(current_active_user)
 ):
     script_service = ScriptService(session)
-    return await script_service.create_script(script, current_user, file)
+    return await script_service.create_script(script, current_user, None)
+
+
+@router.post("/upload", response_model=ScriptRead)
+async def upload_script(
+    name: str,
+    description: str = "",
+    file: UploadFile = File(...),
+    session: AsyncSession = Depends(get_async_session),
+    current_user: User = Depends(current_active_user)
+):
+    from ..schemas.script import ScriptCreate
+    script_data = ScriptCreate(name=name, description=description)
+    script_service = ScriptService(session)
+    return await script_service.create_script(script_data, current_user, file)
 
 
 @router.get("/", response_model=List[ScriptRead])
