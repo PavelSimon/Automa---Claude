@@ -59,7 +59,7 @@ class JobService:
     async def get_job(self, job_id: int, user: User) -> Optional[Job]:
         query = select(Job).where(
             and_(Job.id == job_id, Job.created_by == user.id)
-        ).options(selectinload(Job.agent))
+        ).options(selectinload(Job.agent), selectinload(Job.executions))
 
         result = await self.session.execute(query)
         return result.scalar_one_or_none()

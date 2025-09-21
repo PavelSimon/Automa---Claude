@@ -10,11 +10,11 @@ class Agent(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(255), nullable=False, index=True)
     description = Column(Text)
-    script_id = Column(Integer, ForeignKey("scripts.id"), nullable=False)
+    script_id = Column(Integer, ForeignKey("scripts.id"), nullable=False, index=True)
     config_json = Column(JSON)
-    is_active = Column(Boolean, default=True)
-    status = Column(String(50), default="stopped")  # stopped, running, error
-    created_by = Column(Integer, ForeignKey("users.id"), nullable=False)
+    is_active = Column(Boolean, default=True, index=True)
+    status = Column(String(50), default="stopped", index=True)  # stopped, running, error
+    created_by = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
