@@ -39,7 +39,11 @@
         </template>
 
         <v-list>
-          <v-list-item @click="logout">
+          <v-list-item to="/profile" prepend-icon="mdi-account-edit">
+            <v-list-item-title>Profile</v-list-item-title>
+          </v-list-item>
+          <v-divider></v-divider>
+          <v-list-item @click="logout" prepend-icon="mdi-logout">
             <v-list-item-title>Logout</v-list-item-title>
           </v-list-item>
         </v-list>
