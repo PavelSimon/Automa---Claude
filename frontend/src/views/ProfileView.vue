@@ -43,6 +43,14 @@
                 :loading="loadingTimezones"
               ></v-select>
 
+              <v-switch
+                v-model="profileForm.dark_mode"
+                label="Dark Mode"
+                hint="Enable dark theme for the application"
+                persistent-hint
+                color="primary"
+              ></v-switch>
+
               <div class="mt-4">
                 <v-btn
                   type="submit"
@@ -113,9 +121,11 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import axios from 'axios'
 import { useAuthStore } from '@/stores/auth'
+import { useThemeStore } from '@/stores/theme'
 import { formatDate } from '@/utils/datetime'
 
 const authStore = useAuthStore()
+const themeStore = useThemeStore()
 
 const user = ref({})
 const originalProfile = ref({})
@@ -123,7 +133,8 @@ const profileForm = ref({
   email: '',
   first_name: '',
   last_name: '',
-  timezone: 'Europe/Bratislava'
+  timezone: 'Europe/Bratislava',
+  dark_mode: false
 })
 
 const timezones = ref([])
@@ -152,7 +163,8 @@ const loadProfile = async () => {
       email: user.value.email,
       first_name: user.value.first_name || '',
       last_name: user.value.last_name || '',
-      timezone: user.value.timezone || 'Europe/Bratislava'
+      timezone: user.value.timezone || 'Europe/Bratislava',
+      dark_mode: user.value.dark_mode !== undefined ? user.value.dark_mode : themeStore.isDarkMode
     }
 
     originalProfile.value = { ...profileForm.value }
@@ -188,10 +200,14 @@ const saveProfile = async () => {
     const updateData = {
       first_name: profileForm.value.first_name || null,
       last_name: profileForm.value.last_name || null,
-      timezone: profileForm.value.timezone
+      timezone: profileForm.value.timezone,
+      dark_mode: profileForm.value.dark_mode
     }
 
     await axios.put('/api/v1/profile/me', updateData)
+
+    // Update theme store with new dark mode setting
+    themeStore.setDarkMode(profileForm.value.dark_mode)
 
     // Update original form data
     originalProfile.value = { ...profileForm.value }
@@ -241,6 +257,11 @@ const updateLocalTime = () => {
 // Watch timezone changes to update local time
 watch(() => profileForm.value.timezone, () => {
   updateLocalTime()
+})
+
+// Watch dark mode changes to apply theme immediately
+watch(() => profileForm.value.dark_mode, (newValue) => {
+  themeStore.setDarkMode(newValue)
 })
 
 onMounted(async () => {

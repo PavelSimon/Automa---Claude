@@ -13,6 +13,7 @@ class UserRead(schemas.BaseUser[int]):
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     timezone: str = "Europe/Bratislava"
+    dark_mode: bool = False
     created_at: datetime
 
 
@@ -25,6 +26,7 @@ class UserCreate(schemas.BaseUserCreate):
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     timezone: Optional[str] = "Europe/Bratislava"
+    dark_mode: Optional[bool] = False
 
 
 class UserUpdate(schemas.BaseUserUpdate):
@@ -36,6 +38,7 @@ class UserUpdate(schemas.BaseUserUpdate):
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     timezone: Optional[str] = None
+    dark_mode: Optional[bool] = None
 
 
 class UserProfileUpdate(BaseModel):
@@ -43,3 +46,4 @@ class UserProfileUpdate(BaseModel):
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     timezone: Optional[str] = None
+    dark_mode: Optional[bool] = None

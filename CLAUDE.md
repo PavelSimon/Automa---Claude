@@ -141,8 +141,21 @@ Based on project requirements:
 - Real-time monitoring dashboard
 - Comprehensive audit logging
 - Docker-based sandboxed script execution
+- **User Profile Management with Dark Mode**: Complete profile editing system with dark theme support
 
 ## Recent Updates (2025-09-21)
+
+### Latest Update: Profile Management & Dark Mode (2025-09-21)
+7. **User Profile & Dark Mode Implementation**:
+   - Added `dark_mode` column to User model with database migration
+   - Extended UserRead, UserCreate, UserUpdate, and UserProfileUpdate schemas
+   - Profile API already existed and now supports dark mode preference
+   - Created theme store (`stores/theme.js`) for centralized dark mode management
+   - Updated ProfileView with dark mode toggle and instant theme switching
+   - Enhanced App.vue with Vuetify theme integration and user preference sync
+   - Dark mode persists in localStorage and syncs with user profile
+   - All backend tests pass (9/9), backend linting clean
+   - Manual API testing confirmed full dark mode functionality
 
 1. **Complete API Implementation**:
    - Added Agents API: CRUD operations, start/stop/restart functionality
