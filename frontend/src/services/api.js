@@ -140,8 +140,8 @@ export const apiService = {
   // Monitoring
   monitoring: {
     status: () => api.get('/api/v1/monitoring/status'),
-    executions: (limit = 10) => api.get('/api/v1/monitoring/executions/recent', {
-      params: { limit }
+    executions: (limit) => api.get('/api/v1/monitoring/executions/recent', {
+      params: limit ? { limit } : {}
     })
   }
 }

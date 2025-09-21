@@ -165,7 +165,7 @@ class JobService:
         result = await self.session.execute(query)
         return result.scalars().all()
 
-    async def get_recent_executions(self, user: User, limit: int = 10) -> List[JobExecution]:
+    async def get_recent_executions(self, user: User, limit: int = 1000) -> List[JobExecution]:
         """Get recent job executions for monitoring dashboard"""
         query = select(JobExecution)\
             .join(Job)\
