@@ -6,7 +6,7 @@ from .database import create_db_and_tables
 from .config import settings
 from .core.deps import fastapi_users, auth_backend
 from .schemas.user import UserRead, UserCreate
-from .api import scripts
+from .api import scripts, agents, jobs, monitoring
 from . import models
 
 
@@ -55,6 +55,9 @@ app.include_router(
 
 # API routes
 app.include_router(scripts.router, prefix="/api/v1")
+app.include_router(agents.router, prefix="/api/v1")
+app.include_router(jobs.router, prefix="/api/v1")
+app.include_router(monitoring.router, prefix="/api/v1")
 
 
 @app.get("/")

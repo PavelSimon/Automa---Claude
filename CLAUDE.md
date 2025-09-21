@@ -27,11 +27,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Fully functional Python agent management platform with:
 - **Backend**: FastAPI with SQLAlchemy, JWT authentication (fixed argon2 support), Docker sandboxing
 - **Frontend**: Vue.js 3 with Vuetify, complete UI for scripts/agents/jobs/monitoring
-- **Database**: SQLite with comprehensive models (User, Script, Agent, Job, AuditLog)
+- **Database**: SQLite with comprehensive models (User, Script, Agent, Job, JobExecution, AuditLog)
 - **Security**: JWT tokens with argon2 password hashing, audit logging, Docker container isolation
-- **API**: Full REST API with OpenAPI documentation at `/docs`
+- **API**: Complete REST API with all endpoints implemented - Scripts, Agents, Jobs, Monitoring
 - **Docker**: Complete containerization with docker-compose setup
 - **Authentication**: Fixed login issues - now fully working with fastapi-users
+- **Testing**: Basic test suite covering API endpoints and services
 
 ## Development Commands
 
@@ -87,10 +88,8 @@ docker-compose logs -f backend
 
 ### Testing and Linting
 ```bash
-# Backend tests
-uv run pytest backend/tests/
-# or via development script
-uv run scripts/dev.py test
+# Backend tests (from project root)
+cd backend && uv run pytest tests/ -v
 
 # Backend linting
 uv run ruff check backend/
@@ -143,17 +142,38 @@ Based on project requirements:
 - Comprehensive audit logging
 - Docker-based sandboxed script execution
 
-## Recent Fixes (2025-09-20)
+## Recent Updates (2025-09-21)
 
-1. **Authentication System**:
-   - Fixed `on_after_login` method signature in UserManager
-   - Added argon2 support to passlib context
-   - Resolved password verification issues
+1. **Complete API Implementation**:
+   - Added Agents API: CRUD operations, start/stop/restart functionality
+   - Added Jobs API: Job scheduling, execution, history tracking
+   - Added Monitoring API: System metrics, Docker status, dashboard data
+   - All frontend endpoints now have matching backend implementations
 
-2. **Development Scripts**:
-   - Fixed `scripts/dev.py` to use proper cwd for frontend commands
-   - No longer uses os.chdir() which caused path issues
+2. **New Services**:
+   - AgentService: Complete agent lifecycle management
+   - JobService: Job scheduling and execution tracking
+   - MonitoringService: System and Docker monitoring with psutil integration
 
-3. **Dependencies**:
-   - Updated pyproject.toml to include argon2 support: `passlib[bcrypt,argon2]`
-   - Ensured all required packages are properly installed
+3. **Testing Infrastructure**:
+   - Added basic test suite covering API endpoints and services
+   - Fixed import paths and test client configuration
+   - All tests passing (9/9)
+
+4. **Dependencies**:
+   - Added psutil for system monitoring
+   - Fixed audit logging with proper log_action function
+
+5. **Previous Fixes (2025-09-20)**:
+   - Fixed authentication system with argon2 support
+   - Resolved development script path issues
+   - Updated dependencies for proper package management
+
+## Development Workflow Standard
+
+After every development step, automatically:
+1. Run tests: `cd backend && uv run pytest tests/ -v`
+2. Update CLAUDE.md with changes made
+3. Create git commit with descriptive message
+
+This ensures code quality and proper documentation tracking.
