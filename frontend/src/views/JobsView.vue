@@ -209,7 +209,7 @@ const onScheduleTypeChange = () => {
 const loadJobs = async () => {
   loading.value = true
   try {
-    const response = await axios.get('/api/v1/jobs')
+    const response = await axios.get('/api/v1/jobs/')
     jobs.value = response.data
   } catch (error) {
     console.error('Failed to load jobs:', error)
@@ -220,7 +220,7 @@ const loadJobs = async () => {
 
 const loadAgents = async () => {
   try {
-    const response = await axios.get('/api/v1/agents')
+    const response = await axios.get('/api/v1/agents/')
     agents.value = response.data
   } catch (error) {
     console.error('Failed to load agents:', error)
@@ -233,7 +233,7 @@ const saveJob = async () => {
     if (editingJob.value) {
       await axios.put(`/api/v1/jobs/${editingJob.value.id}`, jobForm.value)
     } else {
-      await axios.post('/api/v1/jobs', jobForm.value)
+      await axios.post('/api/v1/jobs/', jobForm.value)
     }
     await loadJobs()
     closeDialog()

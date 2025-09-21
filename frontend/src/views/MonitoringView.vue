@@ -253,7 +253,7 @@ const loadMonitoringData = async () => {
   loading.value = true
   try {
     // Load active agents
-    const agentsResponse = await axios.get('/api/v1/agents?status=running')
+    const agentsResponse = await axios.get('/api/v1/agents/?status=running')
     activeAgents.value = agentsResponse.data
 
     // Load recent executions

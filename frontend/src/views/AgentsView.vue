@@ -170,7 +170,7 @@ const getStatusColor = (status) => {
 const loadAgents = async () => {
   loading.value = true
   try {
-    const response = await axios.get('/api/v1/agents')
+    const response = await axios.get('/api/v1/agents/')
     agents.value = response.data
   } catch (error) {
     console.error('Failed to load agents:', error)
@@ -181,7 +181,7 @@ const loadAgents = async () => {
 
 const loadScripts = async () => {
   try {
-    const response = await axios.get('/api/v1/scripts')
+    const response = await axios.get('/api/v1/scripts/')
     scripts.value = response.data
   } catch (error) {
     console.error('Failed to load scripts:', error)
@@ -194,7 +194,7 @@ const saveAgent = async () => {
     if (editingAgent.value) {
       await axios.put(`/api/v1/agents/${editingAgent.value.id}`, agentForm.value)
     } else {
-      await axios.post('/api/v1/agents', agentForm.value)
+      await axios.post('/api/v1/agents/', agentForm.value)
     }
     await loadAgents()
     closeDialog()

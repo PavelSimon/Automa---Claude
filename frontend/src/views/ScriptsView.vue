@@ -117,7 +117,7 @@ const headers = [
 const loadScripts = async () => {
   loading.value = true
   try {
-    const response = await axios.get('/api/v1/scripts')
+    const response = await axios.get('/api/v1/scripts/')
     scripts.value = response.data
   } catch (error) {
     console.error('Failed to load scripts:', error)
@@ -132,7 +132,7 @@ const saveScript = async () => {
     if (editingScript.value) {
       await axios.put(`/api/v1/scripts/${editingScript.value.id}`, scriptForm.value)
     } else {
-      await axios.post('/api/v1/scripts', scriptForm.value)
+      await axios.post('/api/v1/scripts/', scriptForm.value)
     }
     await loadScripts()
     closeDialog()

@@ -164,6 +164,8 @@ Based on project requirements:
    - Fixed sidebar disappearing on Monitoring page navigation
    - Improved axios interceptor to prevent unnecessary logouts on API errors
    - Added drawer state management with authentication watching
+   - Fixed authentication initialization on app startup
+   - Resolved 307 redirects by adding trailing slashes to API endpoints
 
 5. **Dependencies**:
    - Added psutil for system monitoring
