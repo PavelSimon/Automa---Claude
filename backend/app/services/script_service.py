@@ -32,13 +32,17 @@ class ScriptService:
 
         if script_data.is_file_based and script_data.external_file_path:
             # File-based script: use external file path
-            if os.path.exists(script_data.external_file_path):
-                script.file_path = script_data.external_file_path
+            # Clean the path - remove surrounding quotes if present
+            clean_path = script_data.external_file_path.strip().strip('"').strip("'")
+
+            if os.path.exists(clean_path):
+                script.file_path = clean_path
+                script.external_file_path = clean_path
                 # Read content from external file for storage
-                async with aiofiles.open(script_data.external_file_path, 'r', encoding='utf-8') as f:
+                async with aiofiles.open(clean_path, 'r', encoding='utf-8') as f:
                     script.content = await f.read()
             else:
-                raise FileNotFoundError(f"External script file not found: {script_data.external_file_path}")
+                raise FileNotFoundError(f"External script file not found: {clean_path}")
         elif file:
             # Uploaded file
             file_path = os.path.join(settings.scripts_directory, f"{script_data.name}_{user.id}.py")
@@ -89,11 +93,15 @@ class ScriptService:
 
         # Handle file path changes
         if script_data.is_file_based is not None and script_data.external_file_path:
-            if script_data.is_file_based and os.path.exists(script_data.external_file_path):
+            # Clean the path - remove surrounding quotes if present
+            clean_path = script_data.external_file_path.strip().strip('"').strip("'")
+
+            if script_data.is_file_based and os.path.exists(clean_path):
                 # Switch to external file
-                script.file_path = script_data.external_file_path
+                script.file_path = clean_path
+                script.external_file_path = clean_path
                 # Read content from external file
-                async with aiofiles.open(script_data.external_file_path, 'r', encoding='utf-8') as f:
+                async with aiofiles.open(clean_path, 'r', encoding='utf-8') as f:
                     script.content = await f.read()
             elif not script_data.is_file_based:
                 # Switch to inline content - create new file in scripts directory

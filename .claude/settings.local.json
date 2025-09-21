@@ -14,7 +14,9 @@
       "Bash(sqlite3:*)",
       "Bash(grep:*)",
       "Bash(tree:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(git rm:*)",
+      "Bash(dir \"C:\\Users\\Admin\\Devel\\Automa - Claude\\scripts\")"
     ],
     "deny": [],
     "ask": []

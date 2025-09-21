@@ -20,10 +20,12 @@ class SandboxService:
 
         # For file-based scripts, use the external file if it exists and is different
         if script.is_file_based and script.external_file_path:
-            if os.path.exists(script.external_file_path):
-                exec_file_path = script.external_file_path
+            # Clean the path - remove surrounding quotes if present
+            clean_path = script.external_file_path.strip().strip('"').strip("'")
+            if os.path.exists(clean_path):
+                exec_file_path = clean_path
             else:
-                raise ValueError(f"External script file not found: {script.external_file_path}")
+                raise ValueError(f"External script file not found: {clean_path}")
 
         if not exec_file_path or not os.path.exists(exec_file_path):
             raise ValueError("Script file not found")

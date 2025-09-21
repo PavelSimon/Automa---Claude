@@ -30,3 +30,9 @@ Thumbs.db
 
 # config files
 .env
+
+# súbory skriptov
+scripts/
+
+# súbory dát
+data/
