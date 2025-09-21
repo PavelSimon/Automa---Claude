@@ -23,7 +23,10 @@
       "Bash(sudo apt install:*)",
       "Bash(python3:*)",
       "Bash(npm run lint)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(chmod:*)",
+      "Bash(./run.sh:*)",
+      "Read(//home/pavel/**)"
     ],
     "deny": [],
     "ask": []
