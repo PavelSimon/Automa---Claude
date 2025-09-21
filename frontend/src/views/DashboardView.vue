@@ -128,7 +128,7 @@ const loadDashboardData = async () => {
     const activeJobs = jobs.filter(job => job.is_active)
 
     // Load recent executions
-    const executionsResponse = await axios.get('/api/v1/monitoring/executions/recent?limit=10')
+    const executionsResponse = await axios.get('/api/v1/monitoring/executions/recent')
     const executions = executionsResponse.data
 
     // Update stats
