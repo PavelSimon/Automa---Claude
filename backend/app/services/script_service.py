@@ -24,21 +24,36 @@ class ScriptService:
             name=script_data.name,
             description=script_data.description,
             content=script_data.content,
+            is_file_based=script_data.is_file_based or False,
+            external_file_path=script_data.external_file_path,
             created_by=user.id,
             file_path=""
         )
 
-        if file:
+        if script_data.is_file_based and script_data.external_file_path:
+            # File-based script: use external file path
+            if os.path.exists(script_data.external_file_path):
+                script.file_path = script_data.external_file_path
+                # Read content from external file for storage
+                async with aiofiles.open(script_data.external_file_path, 'r', encoding='utf-8') as f:
+                    script.content = await f.read()
+            else:
+                raise FileNotFoundError(f"External script file not found: {script_data.external_file_path}")
+        elif file:
+            # Uploaded file
             file_path = os.path.join(settings.scripts_directory, f"{script_data.name}_{user.id}.py")
             async with aiofiles.open(file_path, 'wb') as f:
                 content = await file.read()
                 await f.write(content)
             script.file_path = file_path
+            script.is_file_based = True
         elif script_data.content:
+            # Inline content: create file in scripts directory
             file_path = os.path.join(settings.scripts_directory, f"{script_data.name}_{user.id}.py")
-            async with aiofiles.open(file_path, 'w') as f:
+            async with aiofiles.open(file_path, 'w', encoding='utf-8') as f:
                 await f.write(script_data.content)
             script.file_path = file_path
+            script.is_file_based = False
 
         self.session.add(script)
         await self.session.commit()
@@ -72,8 +87,27 @@ class ScriptService:
         for field, value in update_data.items():
             setattr(script, field, value)
 
-        if script_data.content and script.file_path:
-            async with aiofiles.open(script.file_path, 'w') as f:
+        # Handle file path changes
+        if script_data.is_file_based is not None and script_data.external_file_path:
+            if script_data.is_file_based and os.path.exists(script_data.external_file_path):
+                # Switch to external file
+                script.file_path = script_data.external_file_path
+                # Read content from external file
+                async with aiofiles.open(script_data.external_file_path, 'r', encoding='utf-8') as f:
+                    script.content = await f.read()
+            elif not script_data.is_file_based:
+                # Switch to inline content - create new file in scripts directory
+                if script.file_path and script.external_file_path and script.file_path == script.external_file_path:
+                    # Moving from external to internal, create new internal file
+                    new_file_path = os.path.join(settings.scripts_directory, f"{script.name}_{user.id}.py")
+                    if script_data.content:
+                        async with aiofiles.open(new_file_path, 'w', encoding='utf-8') as f:
+                            await f.write(script_data.content)
+                    script.file_path = new_file_path
+                    script.external_file_path = None
+        elif script_data.content and script.file_path and not script.is_file_based:
+            # Update inline content
+            async with aiofiles.open(script.file_path, 'w', encoding='utf-8') as f:
                 await f.write(script_data.content)
 
         await self.session.commit()

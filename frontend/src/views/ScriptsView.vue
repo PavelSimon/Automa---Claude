@@ -70,7 +70,23 @@
               rows="3"
             ></v-textarea>
 
+            <v-switch
+              v-model="scriptForm.is_file_based"
+              label="Use external Python file"
+              @update:model-value="onScriptTypeChange"
+            ></v-switch>
+
+            <v-text-field
+              v-if="scriptForm.is_file_based"
+              v-model="scriptForm.external_file_path"
+              label="Path to Python file"
+              placeholder="C:\path\to\your\script.py"
+              hint="Absolute path to existing .py file on the server"
+              persistent-hint
+            ></v-text-field>
+
             <v-textarea
+              v-if="!scriptForm.is_file_based"
               v-model="scriptForm.content"
               label="Python Code"
               rows="10"
@@ -105,7 +121,9 @@ const editingScript = ref(null)
 const scriptForm = ref({
   name: '',
   description: '',
-  content: ''
+  content: '',
+  is_file_based: false,
+  external_file_path: ''
 })
 
 const headers = [
@@ -149,9 +167,21 @@ const editScript = (script) => {
   scriptForm.value = {
     name: script.name,
     description: script.description || '',
-    content: script.content || ''
+    content: script.content || '',
+    is_file_based: script.is_file_based || false,
+    external_file_path: script.external_file_path || ''
   }
   showCreateDialog.value = true
+}
+
+const onScriptTypeChange = () => {
+  if (scriptForm.value.is_file_based) {
+    // Clear content when switching to file-based
+    scriptForm.value.content = ''
+  } else {
+    // Clear file path when switching to inline
+    scriptForm.value.external_file_path = ''
+  }
 }
 
 const deleteScript = async (script) => {
@@ -171,7 +201,9 @@ const closeDialog = () => {
   scriptForm.value = {
     name: '',
     description: '',
-    content: ''
+    content: '',
+    is_file_based: false,
+    external_file_path: ''
   }
 }
 

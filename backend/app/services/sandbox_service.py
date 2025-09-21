@@ -15,7 +15,17 @@ class SandboxService:
         script: Script,
         config: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
-        if not script.file_path or not os.path.exists(script.file_path):
+        # Determine which file to execute
+        exec_file_path = script.file_path
+
+        # For file-based scripts, use the external file if it exists and is different
+        if script.is_file_based and script.external_file_path:
+            if os.path.exists(script.external_file_path):
+                exec_file_path = script.external_file_path
+            else:
+                raise ValueError(f"External script file not found: {script.external_file_path}")
+
+        if not exec_file_path or not os.path.exists(exec_file_path):
             raise ValueError("Script file not found")
 
         container_name = f"automa_script_{script.id}"
@@ -25,7 +35,7 @@ class SandboxService:
                 image=settings.sandbox_image,
                 command="python /app/script.py",
                 volumes={
-                    script.file_path: {
+                    exec_file_path: {
                         'bind': '/app/script.py',
                         'mode': 'ro'
                     }

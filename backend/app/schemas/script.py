@@ -7,6 +7,8 @@ class ScriptBase(BaseModel):
     name: str
     description: Optional[str] = None
     content: Optional[str] = None
+    is_file_based: Optional[bool] = False
+    external_file_path: Optional[str] = None
 
 
 class ScriptCreate(ScriptBase):
@@ -17,6 +19,8 @@ class ScriptUpdate(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
     content: Optional[str] = None
+    is_file_based: Optional[bool] = None
+    external_file_path: Optional[str] = None
 
 
 class ScriptRead(ScriptBase):

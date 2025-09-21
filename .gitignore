@@ -6,6 +6,10 @@ dist/
 wheels/
 *.egg-info
 
+# Database files
+automa.db
+data/automa.db
+
 # Virtual environments
 .venv
 
@@ -23,10 +27,6 @@ yarn-error.log*
 # OS files
 .DS_Store
 Thumbs.db
-
-# Database files
-automa.db
-data/automa.db
 
 # config files
 .env
