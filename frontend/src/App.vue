@@ -55,7 +55,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from './stores/auth'
 
@@ -63,8 +63,14 @@ const router = useRouter()
 const authStore = useAuthStore()
 
 const drawer = ref(true)
-
 const isAuthenticated = computed(() => authStore.isAuthenticated)
+
+// Watch for auth changes and keep drawer state
+watch(isAuthenticated, (newValue) => {
+  if (newValue && !drawer.value) {
+    drawer.value = true
+  }
+}, { immediate: true })
 
 const logout = async () => {
   await authStore.logout()

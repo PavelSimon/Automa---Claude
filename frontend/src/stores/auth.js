@@ -98,8 +98,12 @@ axios.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      const authStore = useAuthStore()
-      authStore.logout()
+      // Only logout on auth endpoints, not on API errors
+      const url = error.config?.url || ''
+      if (url.includes('/auth/') || url.includes('/users/me')) {
+        const authStore = useAuthStore()
+        authStore.logout()
+      }
     }
     return Promise.reject(error)
   }
