@@ -4,12 +4,21 @@ from contextlib import asynccontextmanager
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
+from starlette.exceptions import HTTPException as StarletteHTTPException
+from sqlalchemy.exc import SQLAlchemyError
 
 from .database import create_db_and_tables
 from .config import settings
 from .core.deps import fastapi_users, auth_backend
 from .schemas.user import UserRead, UserCreate
-from .api import scripts, agents, jobs, monitoring, profile
+from .api import scripts, agents, jobs, monitoring, profile, health
+from .core.exceptions import (
+    AutomaException,
+    http_exception_handler,
+    automa_exception_handler,
+    sqlalchemy_exception_handler,
+    general_exception_handler
+)
 
 # Initialize rate limiter
 limiter = Limiter(key_func=get_remote_address)
@@ -33,6 +42,12 @@ app = FastAPI(
 # Rate limiting
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+# Exception handlers
+app.add_exception_handler(StarletteHTTPException, http_exception_handler)
+app.add_exception_handler(AutomaException, automa_exception_handler)
+app.add_exception_handler(SQLAlchemyError, sqlalchemy_exception_handler)
+app.add_exception_handler(Exception, general_exception_handler)
 
 # CORS middleware
 app.add_middleware(
@@ -69,6 +84,9 @@ app.include_router(jobs.router, prefix="/api/v1")
 app.include_router(monitoring.router, prefix="/api/v1")
 app.include_router(profile.router, prefix="/api/v1")
 
+# Health and monitoring routes (no auth required)
+app.include_router(health.router, tags=["health"])
+
 
 @app.get("/")
 @limiter.limit("100/minute")
@@ -80,10 +98,7 @@ async def root(request: Request):
     }
 
 
-@app.get("/health")
-@limiter.limit("200/minute")
-async def health_check(request: Request):
-    return {"status": "healthy"}
+# Basic health check is now handled by health router
 
 
 def main():

@@ -240,7 +240,17 @@ Automa projekt je v dobrom stave s funkčnou architektúrou, ale vyžaduje pozor
 
 ## História implementácie
 
-### Security & Performance Phase 4: Modernization & Frontend Optimization (2025-09-21 - Najnovšie)
+### Security & Performance Phase 5: Testing & Monitoring Infrastructure (2025-09-21 - Najnovšie)
+12. **Testovanie a monitoring infraštruktúra**:
+   - Implementácia frontend unit testov s Vitest (16 testov úspešne prebieha)
+   - Pridanie komplexných health check endpointov (/health, /health/detailed, /liveness, /readiness)
+   - Prometheus metrics endpoint (/metrics) pre system monitoring
+   - Centralizované error handling s structured loggingom a unique error IDs
+   - Kubernetes-ready health probes pre container orchestration
+   - Backend testy rozšírené na 13 testov (všetky úspešné)
+   - **Testing Coverage: 2/10 → 7/10** | **Observability: 3/10 → 9/10**
+
+### Security & Performance Phase 4: Modernization & Frontend Optimization (2025-09-21)
 11. **Modernizácia kódu a frontend optimalizácie**:
    - Aktualizácia Pydantic validátorov z v1 na v2 syntax (`@field_validator` namiesto `@validator`)
    - Modernizácia SQLAlchemy importov (`from sqlalchemy.orm import declarative_base`)
