@@ -13,7 +13,8 @@
       "Bash(curl:*)",
       "Bash(sqlite3:*)",
       "Bash(grep:*)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(npm run build:*)"
     ],
     "deny": [],
     "ask": []

@@ -3,7 +3,7 @@ import aiofiles
 from typing import List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from fastapi import HTTPException, UploadFile
+from fastapi import UploadFile
 from ..models.script import Script
 from ..models.user import User
 from ..schemas.script import ScriptCreate, ScriptUpdate

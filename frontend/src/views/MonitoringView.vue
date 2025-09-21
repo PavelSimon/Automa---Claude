@@ -332,22 +332,30 @@ const loadMonitoringData = async () => {
     activeAgents.value = agentsResponse.data
 
     // Load recent executions
-    const executionsResponse = await axios.get('/api/v1/executions/recent')
+    const executionsResponse = await axios.get('/api/v1/monitoring/executions/recent?limit=10')
     recentExecutions.value = executionsResponse.data
 
     // Check Docker status
     try {
-      await axios.get('/api/v1/monitoring/docker')
-      dockerStatus.value = true
-    } catch {
+      const dockerResponse = await axios.get('/api/v1/monitoring/docker')
+      dockerStatus.value = dockerResponse.data.available || false
+    } catch (error) {
+      console.error('Failed to check Docker status:', error)
       dockerStatus.value = false
     }
 
-    // Simulate resource usage (in real app, this would come from system monitoring)
-    resourceUsage.value = {
-      cpu: Math.floor(Math.random() * 50) + 10,
-      memory: Math.floor(Math.random() * 60) + 20,
-      disk: Math.floor(Math.random() * 40) + 40
+    // Load real resource usage
+    try {
+      const systemResponse = await axios.get('/api/v1/monitoring/system')
+      resourceUsage.value = systemResponse.data
+    } catch (error) {
+      console.error('Failed to load system metrics:', error)
+      // Fallback to simulated values
+      resourceUsage.value = {
+        cpu: Math.floor(Math.random() * 50) + 10,
+        memory: Math.floor(Math.random() * 60) + 20,
+        disk: Math.floor(Math.random() * 40) + 40
+      }
     }
   } catch (error) {
     console.error('Failed to load monitoring data:', error)

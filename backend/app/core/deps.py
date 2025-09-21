@@ -1,4 +1,4 @@
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends
 from fastapi.security import HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 from ..database import get_async_session
@@ -6,7 +6,6 @@ from ..models.user import User
 from fastapi_users import FastAPIUsers
 from fastapi_users.db import SQLAlchemyUserDatabase
 from .security import auth_backend
-from ..schemas.user import UserRead, UserCreate, UserUpdate
 
 security = HTTPBearer()
 

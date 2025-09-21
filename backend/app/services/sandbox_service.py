@@ -1,5 +1,4 @@
 import docker
-import asyncio
 import tempfile
 import os
 from typing import Dict, Any, Optional
@@ -24,7 +23,7 @@ class SandboxService:
         try:
             container = self.docker_client.containers.run(
                 image=settings.sandbox_image,
-                command=f"python /app/script.py",
+                command="python /app/script.py",
                 volumes={
                     script.file_path: {
                         'bind': '/app/script.py',

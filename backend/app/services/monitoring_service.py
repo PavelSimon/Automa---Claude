@@ -73,7 +73,8 @@ class MonitoringService:
 
             for container in containers:
                 try:
-                    stats = container.stats(stream=False) if container.status == 'running' else None
+                    # Get container stats if running (currently unused but prepared for future metrics)
+                    # stats = container.stats(stream=False) if container.status == 'running' else None
                     container_data.append({
                         "id": container.id[:12],
                         "name": container.name,
@@ -165,5 +166,5 @@ class MonitoringService:
 
             return container_data
 
-        except Exception as e:
+        except Exception:
             return []

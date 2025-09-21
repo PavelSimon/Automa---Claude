@@ -1,5 +1,4 @@
 from fastapi_users import schemas
-from pydantic import BaseModel
 from datetime import datetime
 from typing import Optional
 

@@ -7,7 +7,6 @@ from .config import settings
 from .core.deps import fastapi_users, auth_backend
 from .schemas.user import UserRead, UserCreate
 from .api import scripts, agents, jobs, monitoring
-from . import models
 
 
 @asynccontextmanager

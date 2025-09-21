@@ -82,7 +82,7 @@ async def execute_job(
     if not execution:
         raise HTTPException(status_code=404, detail="Job not found")
     return {
-        "message": f"Job execution started",
+        "message": "Job execution started",
         "execution_id": execution.id,
         "status": execution.status
     }

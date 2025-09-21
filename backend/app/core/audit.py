@@ -3,7 +3,6 @@ from ..models.audit import AuditLog
 from ..models.user import User
 from fastapi import Request
 from typing import Optional, Dict, Any
-import json
 
 
 async def log_action(
