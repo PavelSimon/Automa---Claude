@@ -1,6 +1,8 @@
 from typing import List
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Request
 from sqlalchemy.ext.asyncio import AsyncSession
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 from ..database import get_async_session
 from ..models.user import User
 from ..schemas.script import ScriptCreate, ScriptRead, ScriptUpdate
@@ -8,10 +10,13 @@ from ..services.script_service import ScriptService
 from ..core.deps import current_active_user
 
 router = APIRouter(prefix="/scripts", tags=["scripts"])
+limiter = Limiter(key_func=get_remote_address)
 
 
 @router.post("/", response_model=ScriptRead)
+@limiter.limit("10/minute")
 async def create_script(
+    request: Request,
     script: ScriptCreate,
     session: AsyncSession = Depends(get_async_session),
     current_user: User = Depends(current_active_user)
@@ -21,7 +26,9 @@ async def create_script(
 
 
 @router.post("/upload", response_model=ScriptRead)
+@limiter.limit("5/minute")
 async def upload_script(
+    request: Request,
     name: str,
     description: str = "",
     file: UploadFile = File(...),
