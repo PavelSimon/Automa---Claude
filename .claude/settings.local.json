@@ -27,7 +27,8 @@
       "Bash(chmod:*)",
       "Bash(./run.sh:*)",
       "Read(//home/pavel/**)",
-      "Bash(npm run test:*)"
+      "Bash(npm run test:*)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []

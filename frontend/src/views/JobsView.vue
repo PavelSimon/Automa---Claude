@@ -151,7 +151,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
+import { apiService } from '@/services/api'
 import { formatDate, formatDateTime } from '@/utils/datetime'
 
 const router = useRouter()
@@ -213,7 +213,7 @@ const onScheduleTypeChange = () => {
 const loadJobs = async () => {
   loading.value = true
   try {
-    const response = await axios.get('/api/v1/jobs/')
+    const response = await apiService.jobs.list()
     jobs.value = response.data
   } catch (error) {
     console.error('Failed to load jobs:', error)
@@ -224,7 +224,7 @@ const loadJobs = async () => {
 
 const loadAgents = async () => {
   try {
-    const response = await axios.get('/api/v1/agents/')
+    const response = await apiService.agents.list()
     agents.value = response.data
   } catch (error) {
     console.error('Failed to load agents:', error)
@@ -235,9 +235,9 @@ const saveJob = async () => {
   saving.value = true
   try {
     if (editingJob.value) {
-      await axios.put(`/api/v1/jobs/${editingJob.value.id}`, jobForm.value)
+      await apiService.jobs.update(editingJob.value.id, jobForm.value)
     } else {
-      await axios.post('/api/v1/jobs/', jobForm.value)
+      await apiService.jobs.create(jobForm.value)
     }
     await loadJobs()
     closeDialog()
@@ -250,7 +250,7 @@ const saveJob = async () => {
 
 const executeJob = async (job) => {
   try {
-    const response = await axios.post(`/api/v1/jobs/${job.id}/execute`)
+    const response = await apiService.jobs.execute(job.id)
 
     // Show success notification
     console.log(`Job "${job.name}" executed successfully`)
@@ -291,7 +291,7 @@ const viewExecutions = (job) => {
 const deleteJob = async (job) => {
   if (confirm(`Are you sure you want to delete "${job.name}"?`)) {
     try {
-      await axios.delete(`/api/v1/jobs/${job.id}`)
+      await apiService.jobs.delete(job.id)
       await loadJobs()
     } catch (error) {
       console.error('Failed to delete job:', error)

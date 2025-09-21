@@ -109,7 +109,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import axios from 'axios'
+import { apiService } from '@/services/api'
 import { formatDate } from '@/utils/datetime'
 
 const scripts = ref([])
@@ -136,7 +136,7 @@ const headers = [
 const loadScripts = async () => {
   loading.value = true
   try {
-    const response = await axios.get('/api/v1/scripts/')
+    const response = await apiService.scripts.list()
     scripts.value = response.data
   } catch (error) {
     console.error('Failed to load scripts:', error)
@@ -149,9 +149,9 @@ const saveScript = async () => {
   saving.value = true
   try {
     if (editingScript.value) {
-      await axios.put(`/api/v1/scripts/${editingScript.value.id}`, scriptForm.value)
+      await apiService.scripts.update(editingScript.value.id, scriptForm.value)
     } else {
-      await axios.post('/api/v1/scripts/', scriptForm.value)
+      await apiService.scripts.create(scriptForm.value)
     }
     await loadScripts()
     closeDialog()
@@ -187,7 +187,7 @@ const onScriptTypeChange = () => {
 const deleteScript = async (script) => {
   if (confirm(`Are you sure you want to delete "${script.name}"?`)) {
     try {
-      await axios.delete(`/api/v1/scripts/${script.id}`)
+      await apiService.scripts.delete(script.id)
       await loadScripts()
     } catch (error) {
       console.error('Failed to delete script:', error)

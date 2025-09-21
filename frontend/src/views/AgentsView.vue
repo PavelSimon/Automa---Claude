@@ -133,7 +133,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import axios from 'axios'
+import { apiService } from '@/services/api'
 import { formatDate } from '@/utils/datetime'
 
 const agents = ref([])
@@ -171,7 +171,7 @@ const getStatusColor = (status) => {
 const loadAgents = async () => {
   loading.value = true
   try {
-    const response = await axios.get('/api/v1/agents/')
+    const response = await apiService.agents.list()
     agents.value = response.data
   } catch (error) {
     console.error('Failed to load agents:', error)
@@ -182,7 +182,7 @@ const loadAgents = async () => {
 
 const loadScripts = async () => {
   try {
-    const response = await axios.get('/api/v1/scripts/')
+    const response = await apiService.scripts.list()
     scripts.value = response.data
   } catch (error) {
     console.error('Failed to load scripts:', error)
@@ -193,9 +193,9 @@ const saveAgent = async () => {
   saving.value = true
   try {
     if (editingAgent.value) {
-      await axios.put(`/api/v1/agents/${editingAgent.value.id}`, agentForm.value)
+      await apiService.agents.update(editingAgent.value.id, agentForm.value)
     } else {
-      await axios.post('/api/v1/agents/', agentForm.value)
+      await apiService.agents.create(agentForm.value)
     }
     await loadAgents()
     closeDialog()
@@ -208,7 +208,7 @@ const saveAgent = async () => {
 
 const startAgent = async (agent) => {
   try {
-    await axios.post(`/api/v1/agents/${agent.id}/start`)
+    await apiService.agents.start(agent.id)
     await loadAgents()
   } catch (error) {
     console.error('Failed to start agent:', error)
@@ -217,7 +217,7 @@ const startAgent = async (agent) => {
 
 const stopAgent = async (agent) => {
   try {
-    await axios.post(`/api/v1/agents/${agent.id}/stop`)
+    await apiService.agents.stop(agent.id)
     await loadAgents()
   } catch (error) {
     console.error('Failed to stop agent:', error)
@@ -238,7 +238,7 @@ const editAgent = (agent) => {
 const deleteAgent = async (agent) => {
   if (confirm(`Are you sure you want to delete "${agent.name}"?`)) {
     try {
-      await axios.delete(`/api/v1/agents/${agent.id}`)
+      await apiService.agents.delete(agent.id)
       await loadAgents()
     } catch (error) {
       console.error('Failed to delete agent:', error)

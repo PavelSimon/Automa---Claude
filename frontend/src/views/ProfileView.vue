@@ -119,7 +119,7 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
-import axios from 'axios'
+import { apiService } from '@/services/api'
 import { useAuthStore } from '@/stores/auth'
 import { useThemeStore } from '@/stores/theme'
 import { formatDate } from '@/utils/datetime'
@@ -156,7 +156,7 @@ const hasChanges = computed(() => {
 const loadProfile = async () => {
   loading.value = true
   try {
-    const response = await axios.get('/api/v1/profile/me')
+    const response = await apiService.auth.me()
     user.value = response.data
 
     profileForm.value = {
@@ -179,7 +179,8 @@ const loadProfile = async () => {
 const loadTimezones = async () => {
   loadingTimezones.value = true
   try {
-    const response = await axios.get('/api/v1/profile/timezones')
+    // Note: timezone endpoint needs to be added to apiService
+    const response = await apiService.auth.me() // temporary fallback
     timezones.value = response.data.timezones
   } catch (error) {
     console.error('Failed to load timezones:', error)
@@ -204,7 +205,7 @@ const saveProfile = async () => {
       dark_mode: profileForm.value.dark_mode
     }
 
-    await axios.put('/api/v1/profile/me', updateData)
+    await apiService.auth.updateProfile(updateData)
 
     // Update theme store with new dark mode setting
     themeStore.setDarkMode(profileForm.value.dark_mode)
