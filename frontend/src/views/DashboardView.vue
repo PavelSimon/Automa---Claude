@@ -11,7 +11,8 @@
         <v-card>
           <v-card-text>
             <div class="text-h6">Scripts</div>
-            <div class="text-h4 text-primary">{{ stats.scripts }}</div>
+            <div class="text-h4 text-primary" v-if="!loading">{{ stats.scripts }}</div>
+            <v-skeleton-loader v-else type="text" width="60"></v-skeleton-loader>
           </v-card-text>
         </v-card>
       </v-col>
@@ -20,7 +21,8 @@
         <v-card>
           <v-card-text>
             <div class="text-h6">Active Agents</div>
-            <div class="text-h4 text-success">{{ stats.activeAgents }}</div>
+            <div class="text-h4 text-success" v-if="!loading">{{ stats.activeAgents }}</div>
+            <v-skeleton-loader v-else type="text" width="60"></v-skeleton-loader>
           </v-card-text>
         </v-card>
       </v-col>
@@ -29,7 +31,8 @@
         <v-card>
           <v-card-text>
             <div class="text-h6">Scheduled Jobs</div>
-            <div class="text-h4 text-info">{{ stats.scheduledJobs }}</div>
+            <div class="text-h4 text-info" v-if="!loading">{{ stats.scheduledJobs }}</div>
+            <v-skeleton-loader v-else type="text" width="60"></v-skeleton-loader>
           </v-card-text>
         </v-card>
       </v-col>
@@ -38,7 +41,8 @@
         <v-card>
           <v-card-text>
             <div class="text-h6">Recent Executions</div>
-            <div class="text-h4 text-warning">{{ stats.recentExecutions }}</div>
+            <div class="text-h4 text-warning" v-if="!loading">{{ stats.recentExecutions }}</div>
+            <v-skeleton-loader v-else type="text" width="60"></v-skeleton-loader>
           </v-card-text>
         </v-card>
       </v-col>
@@ -49,14 +53,20 @@
         <v-card>
           <v-card-title>Recent Activity</v-card-title>
           <v-card-text>
-            <v-list>
+            <v-list v-if="!loading">
               <v-list-item v-for="activity in recentActivity" :key="activity.id">
                 <v-list-item-content>
                   <v-list-item-title>{{ activity.action }}</v-list-item-title>
                   <v-list-item-subtitle>{{ activity.timestamp }}</v-list-item-subtitle>
                 </v-list-item-content>
               </v-list-item>
+              <v-list-item v-if="recentActivity.length === 0">
+                <v-list-item-content>
+                  <v-list-item-title class="text-disabled">No recent activity</v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
             </v-list>
+            <v-skeleton-loader v-else type="list-item-two-line@3"></v-skeleton-loader>
           </v-card-text>
         </v-card>
       </v-col>
@@ -86,6 +96,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import axios from 'axios'
 
 const stats = ref({
   scripts: 0,
@@ -94,22 +105,100 @@ const stats = ref({
   recentExecutions: 0
 })
 
-const recentActivity = ref([
-  { id: 1, action: 'Script "data_processor.py" created', timestamp: '2 minutes ago' },
-  { id: 2, action: 'Agent "Email Scheduler" started', timestamp: '15 minutes ago' },
-  { id: 3, action: 'Job "Daily Report" executed successfully', timestamp: '1 hour ago' },
-])
-
+const recentActivity = ref([])
 const dockerStatus = ref(true)
+const loading = ref(false)
+
+const loadDashboardData = async () => {
+  loading.value = true
+  try {
+    // Load scripts count
+    const scriptsResponse = await axios.get('/api/v1/scripts/')
+    const scripts = scriptsResponse.data
+
+    // Load agents count (and active agents)
+    const agentsResponse = await axios.get('/api/v1/agents/')
+    const agents = agentsResponse.data
+    const activeAgents = agents.filter(agent => agent.status === 'running')
+
+    // Load jobs count (and active jobs)
+    const jobsResponse = await axios.get('/api/v1/jobs/')
+    const jobs = jobsResponse.data
+    const activeJobs = jobs.filter(job => job.is_active)
+
+    // Load recent executions
+    const executionsResponse = await axios.get('/api/v1/monitoring/executions/recent?limit=10')
+    const executions = executionsResponse.data
+
+    // Update stats
+    stats.value = {
+      scripts: scripts.length,
+      activeAgents: activeAgents.length,
+      scheduledJobs: activeJobs.length,
+      recentExecutions: executions.length
+    }
+
+    // Build recent activity from API data
+    const activities = []
+
+    // Add recent script creations
+    scripts.slice(-3).forEach(script => {
+      activities.push({
+        id: `script-${script.id}`,
+        action: `Script "${script.name}" created`,
+        timestamp: formatTimestamp(script.created_at)
+      })
+    })
+
+    // Add recent agent activities
+    agents.slice(-2).forEach(agent => {
+      activities.push({
+        id: `agent-${agent.id}`,
+        action: `Agent "${agent.name}" ${agent.status}`,
+        timestamp: formatTimestamp(agent.updated_at || agent.created_at)
+      })
+    })
+
+    // Add recent executions
+    executions.slice(0, 2).forEach(execution => {
+      activities.push({
+        id: `execution-${execution.id}`,
+        action: `Job execution ${execution.status}`,
+        timestamp: formatTimestamp(execution.started_at)
+      })
+    })
+
+    // Sort by most recent and take first 5
+    recentActivity.value = activities
+      .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+      .slice(0, 5)
+
+  } catch (error) {
+    console.error('Failed to load dashboard data:', error)
+    // Keep default values on error
+  } finally {
+    loading.value = false
+  }
+}
+
+const formatTimestamp = (dateString) => {
+  if (!dateString) return 'Unknown'
+
+  const date = new Date(dateString)
+  const now = new Date()
+  const diffMs = now - date
+  const diffMins = Math.floor(diffMs / 60000)
+  const diffHours = Math.floor(diffMins / 60)
+  const diffDays = Math.floor(diffHours / 24)
+
+  if (diffMins < 1) return 'Just now'
+  if (diffMins < 60) return `${diffMins} minutes ago`
+  if (diffHours < 24) return `${diffHours} hours ago`
+  if (diffDays < 7) return `${diffDays} days ago`
+  return date.toLocaleDateString()
+}
 
 onMounted(async () => {
-  // Load dashboard data
-  // This would typically fetch from API endpoints
-  stats.value = {
-    scripts: 5,
-    activeAgents: 2,
-    scheduledJobs: 8,
-    recentExecutions: 15
-  }
+  await loadDashboardData()
 })
 </script>
