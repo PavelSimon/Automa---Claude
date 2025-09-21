@@ -333,7 +333,7 @@ const loadMonitoringData = async () => {
     activeAgents.value = agentsResponse.data
 
     // Load recent executions
-    const executionsResponse = await axios.get('/api/v1/monitoring/executions/recent?limit=10')
+    const executionsResponse = await axios.get('/api/v1/monitoring/executions/recent')
     recentExecutions.value = executionsResponse.data
 
     // Check Docker status
