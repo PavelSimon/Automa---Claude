@@ -168,6 +168,7 @@ Based on project requirements:
    - Resolved 307 redirects by adding trailing slashes to API endpoints
    - Fixed 422 validation errors by simplifying script creation API to use JSON
    - Updated dashboard to display real-time data from database instead of hardcoded values
+   - Added execution details dialog to view job/agent run results and logs
 
 5. **Dependencies**:
    - Added psutil for system monitoring

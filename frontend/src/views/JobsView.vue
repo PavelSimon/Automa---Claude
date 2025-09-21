@@ -150,7 +150,10 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import axios from 'axios'
+
+const router = useRouter()
 
 const jobs = ref([])
 const agents = ref([])
@@ -246,8 +249,18 @@ const saveJob = async () => {
 
 const executeJob = async (job) => {
   try {
-    await axios.post(`/api/v1/jobs/${job.id}/execute`)
-    console.log(`Job "${job.name}" executed`)
+    const response = await axios.post(`/api/v1/jobs/${job.id}/execute`)
+
+    // Show success notification
+    console.log(`Job "${job.name}" executed successfully`)
+
+    // Reload jobs to refresh the list
+    await loadJobs()
+
+    // Optionally show execution details
+    if (response.data.execution_id) {
+      console.log(`Execution ID: ${response.data.execution_id}`)
+    }
   } catch (error) {
     console.error('Failed to execute job:', error)
   }
@@ -267,8 +280,11 @@ const editJob = (job) => {
 }
 
 const viewExecutions = (job) => {
-  console.log(`Viewing executions for job: ${job.name}`)
-  // TODO: Implement executions view
+  // Navigate to monitoring page with filter for this job
+  router.push({
+    path: '/monitoring',
+    query: { job_id: job.id }
+  })
 }
 
 const deleteJob = async (job) => {

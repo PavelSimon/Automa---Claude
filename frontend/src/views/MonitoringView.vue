@@ -176,6 +176,79 @@
         </v-card>
       </v-col>
     </v-row>
+
+    <!-- Execution Details Dialog -->
+    <v-dialog v-model="executionDialog" max-width="800">
+      <v-card v-if="selectedExecution">
+        <v-card-title>
+          <span class="text-h5">Execution Details</span>
+          <v-spacer></v-spacer>
+          <v-chip
+            :color="getExecutionStatusColor(selectedExecution.status)"
+            small
+          >
+            <v-icon left>{{ getExecutionStatusIcon(selectedExecution.status) }}</v-icon>
+            {{ selectedExecution.status }}
+          </v-chip>
+        </v-card-title>
+
+        <v-card-text>
+          <v-row>
+            <v-col cols="6">
+              <div class="text-subtitle2 mb-1">Execution ID</div>
+              <div class="text-body-1">#{{ selectedExecution.id }}</div>
+            </v-col>
+            <v-col cols="6">
+              <div class="text-subtitle2 mb-1">Job ID</div>
+              <div class="text-body-1">#{{ selectedExecution.job_id }}</div>
+            </v-col>
+            <v-col cols="6">
+              <div class="text-subtitle2 mb-1">Started At</div>
+              <div class="text-body-1">{{ formatDateTime(selectedExecution.started_at) }}</div>
+            </v-col>
+            <v-col cols="6">
+              <div class="text-subtitle2 mb-1">Duration</div>
+              <div class="text-body-1">{{ calculateDuration(selectedExecution.started_at, selectedExecution.finished_at) }}</div>
+            </v-col>
+            <v-col cols="6" v-if="selectedExecution.exit_code !== null">
+              <div class="text-subtitle2 mb-1">Exit Code</div>
+              <div class="text-body-1">{{ selectedExecution.exit_code }}</div>
+            </v-col>
+          </v-row>
+
+          <v-divider class="my-4"></v-divider>
+
+          <div v-if="selectedExecution.output">
+            <div class="text-subtitle2 mb-2">Output</div>
+            <v-card class="mb-4" outlined>
+              <v-card-text>
+                <pre class="text-body-2" style="white-space: pre-wrap; font-family: 'Courier New', monospace;">{{ selectedExecution.output }}</pre>
+              </v-card-text>
+            </v-card>
+          </div>
+
+          <div v-if="selectedExecution.error_log">
+            <div class="text-subtitle2 mb-2">Error Log</div>
+            <v-card class="mb-4" outlined color="error" variant="outlined">
+              <v-card-text>
+                <pre class="text-body-2" style="white-space: pre-wrap; font-family: 'Courier New', monospace; color: #d32f2f;">{{ selectedExecution.error_log }}</pre>
+              </v-card-text>
+            </v-card>
+          </div>
+
+          <div v-if="!selectedExecution.output && !selectedExecution.error_log">
+            <v-alert type="info" text>
+              No output or error logs available for this execution.
+            </v-alert>
+          </div>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" @click="executionDialog = false">Close</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -188,6 +261,8 @@ const dockerStatus = ref(true)
 const activeAgents = ref([])
 const recentExecutions = ref([])
 const refreshInterval = ref(null)
+const executionDialog = ref(false)
+const selectedExecution = ref(null)
 
 const resourceUsage = ref({
   cpu: 25,
@@ -330,8 +405,8 @@ const restartAgent = async (agent) => {
 }
 
 const viewExecutionDetails = (execution) => {
-  console.log(`Viewing details for execution: ${execution.id}`)
-  // TODO: Implement execution details dialog
+  selectedExecution.value = execution
+  executionDialog.value = true
 }
 
 const calculateDuration = (start, end) => {
