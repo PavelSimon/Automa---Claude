@@ -179,6 +179,119 @@ Based on project requirements:
    - Resolved development script path issues
    - Updated dependencies for proper package management
 
+## Credential Management System Implementation Plan (2025-09-27)
+
+### Overview
+Secure credential management system for storing and managing authentication data used by scripts and agents.
+
+### Architecture
+- **Encryption**: Fernet symmetric encryption with user-derived keys
+- **Key Management**: Master key derived from user password + salt
+- **Storage**: Encrypted JSON blobs in database
+- **Access Control**: User-scoped credentials with role-based permissions
+
+### Database Models
+
+#### Credential Model
+```python
+class Credential(Base):
+    __tablename__ = "credentials"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(255), nullable=False, index=True)
+    description = Column(Text)
+    credential_type = Column(String(50), nullable=False)  # api_key, user_pass, oauth, ssh_key, db_connection, custom
+    encrypted_data = Column(LargeBinary, nullable=False)  # Encrypted JSON data
+    encryption_key_id = Column(String(100), nullable=False)  # Key version for rotation
+    tags = Column(JSON)  # For categorization ["aws", "production", "email"]
+    is_active = Column(Boolean, default=True)
+    expires_at = Column(DateTime(timezone=True))  # Optional expiration
+    created_by = Column(Integer, ForeignKey("users.id"), nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    last_used_at = Column(DateTime(timezone=True))
+
+    # Relationships
+    creator = relationship("User", backref="credentials")
+    script_credentials = relationship("ScriptCredential", back_populates="credential")
+```
+
+#### Script-Credential Association
+```python
+class ScriptCredential(Base):
+    __tablename__ = "script_credentials"
+
+    id = Column(Integer, primary_key=True)
+    script_id = Column(Integer, ForeignKey("scripts.id"), nullable=False)
+    credential_id = Column(Integer, ForeignKey("credentials.id"), nullable=False)
+    variable_name = Column(String(100), nullable=False)  # Environment variable name
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    # Relationships
+    script = relationship("Script", backref="script_credentials")
+    credential = relationship("Credential", back_populates="script_credentials")
+```
+
+### API Endpoints
+```
+# Credential Management
+POST   /api/v1/credentials/                           # Create new credential
+GET    /api/v1/credentials/                           # List user's credentials (metadata only)
+GET    /api/v1/credentials/{credential_id}            # Get credential details (no sensitive data)
+PUT    /api/v1/credentials/{credential_id}            # Update credential
+DELETE /api/v1/credentials/{credential_id}            # Delete credential
+POST   /api/v1/credentials/{credential_id}/decrypt    # Decrypt credential data (requires user password)
+POST   /api/v1/credentials/{credential_id}/test       # Test credential validity
+GET    /api/v1/credentials/types                      # Get supported credential types
+
+# Script-Credential Associations
+GET    /api/v1/scripts/{script_id}/credentials        # Get script's credentials
+POST   /api/v1/scripts/{script_id}/credentials        # Assign credential to script
+DELETE /api/v1/scripts/{script_id}/credentials/{credential_id}  # Remove assignment
+```
+
+### Frontend Components
+1. **CredentialsView.vue** - Main credentials management page
+2. **CredentialDialog.vue** - Create/edit modal with type-specific forms
+3. **CredentialTypeCards.vue** - Visual cards for different credential types
+4. **ScriptCredentialAssignment.vue** - Assign credentials to scripts
+
+### Security Features
+- **Encryption at Rest**: All sensitive data encrypted with Fernet
+- **User-Scoped Keys**: Each user has unique encryption key derived from password
+- **No Plain Text**: Sensitive data never stored unencrypted
+- **Rate Limiting**: Decrypt operations rate limited
+- **Audit Trail**: All credential operations logged
+- **Session Security**: Auto-clear clipboard, session timeouts
+- **Key Rotation**: Support for encryption key rotation
+
+### Supported Credential Types
+1. **API Keys** - Single API key with optional headers
+2. **Username/Password** - Basic authentication credentials
+3. **OAuth Tokens** - Access/refresh token pairs with expiration
+4. **SSH Keys** - Public/private key pairs
+5. **Database Connections** - Connection strings and credentials
+6. **Custom** - Flexible JSON structure for any credential type
+
+### Implementation Priority
+1. Database models and migrations
+2. Encryption service and key management
+3. Backend API endpoints
+4. Frontend UI components
+5. Script integration for environment variable injection
+6. Testing and security audit
+
+### Files to Create/Modify
+- `backend/app/models/credential.py`
+- `backend/app/schemas/credential.py`
+- `backend/app/api/credentials.py`
+- `backend/app/services/credential_service.py`
+- `backend/app/services/encryption_service.py`
+- `frontend/src/views/CredentialsView.vue`
+- `frontend/src/components/CredentialDialog.vue`
+- Database migration scripts
+
 ## Development Workflow Standard
 
 After every development step, automatically:
