@@ -21,6 +21,10 @@
         <v-list-item to="/monitoring" prepend-icon="mdi-monitor">
           <v-list-item-title>Monitoring</v-list-item-title>
         </v-list-item>
+
+        <v-list-item to="/credentials" prepend-icon="mdi-key-variant">
+          <v-list-item-title>Credentials</v-list-item-title>
+        </v-list-item>
       </v-list>
     </v-navigation-drawer>
 

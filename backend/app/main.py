@@ -11,7 +11,7 @@ from .database import create_db_and_tables
 from .config import settings
 from .core.deps import fastapi_users, auth_backend
 from .schemas.user import UserRead, UserCreate
-from .api import scripts, agents, jobs, monitoring, profile, health
+from .api import scripts, agents, jobs, monitoring, profile, health, credentials
 from .core.exceptions import (
     AutomaException,
     http_exception_handler,
@@ -83,6 +83,7 @@ app.include_router(agents.router, prefix="/api/v1")
 app.include_router(jobs.router, prefix="/api/v1")
 app.include_router(monitoring.router, prefix="/api/v1")
 app.include_router(profile.router, prefix="/api/v1")
+app.include_router(credentials.router, prefix="/api/v1")
 
 # Health and monitoring routes (no auth required)
 app.include_router(health.router, tags=["health"])
