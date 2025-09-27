@@ -59,12 +59,16 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useTheme } from 'vuetify'
 import { useAuthStore } from './stores/auth'
+import { useThemeStore } from './stores/theme'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const themeStore = useThemeStore()
+const theme = useTheme()
 
 const drawer = ref(true)
 const isAuthenticated = computed(() => authStore.isAuthenticated)
@@ -75,6 +79,26 @@ watch(isAuthenticated, (newValue) => {
     drawer.value = true
   }
 }, { immediate: true })
+
+// Handle theme changes
+const handleThemeChange = (event) => {
+  theme.global.name.value = event.detail.isDark ? 'dark' : 'light'
+}
+
+onMounted(() => {
+  // Set initial theme
+  theme.global.name.value = themeStore.currentTheme
+
+  // Listen for theme change events
+  window.addEventListener('themeChange', handleThemeChange)
+
+  // Initialize theme from user profile when user data is available
+  watch(() => authStore.user, (user) => {
+    if (user && user.dark_mode !== undefined) {
+      themeStore.initializeFromUser(user.dark_mode)
+    }
+  }, { immediate: true })
+})
 
 const logout = async () => {
   await authStore.logout()

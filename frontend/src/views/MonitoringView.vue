@@ -254,7 +254,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-import axios from 'axios'
+import { apiService } from '@/services/api'
 import { formatDateTime, formatDuration } from '@/utils/datetime'
 
 const loading = ref(false)
@@ -329,17 +329,17 @@ const loadMonitoringData = async () => {
   loading.value = true
   try {
     // Load active agents
-    const agentsResponse = await axios.get('/api/v1/agents/?status=running')
+    const agentsResponse = await apiService.agents.list(0, 100, 'running')
     activeAgents.value = agentsResponse.data
 
     // Load recent executions
-    const executionsResponse = await axios.get('/api/v1/monitoring/executions/recent?limit=10')
+    const executionsResponse = await apiService.monitoring.executions()
     recentExecutions.value = executionsResponse.data
 
     // Check Docker status
     try {
-      const dockerResponse = await axios.get('/api/v1/monitoring/docker')
-      dockerStatus.value = dockerResponse.data.available || false
+      const dockerResponse = await apiService.monitoring.status()
+      dockerStatus.value = dockerResponse.data.components?.docker?.status === 'healthy' || false
     } catch (error) {
       console.error('Failed to check Docker status:', error)
       dockerStatus.value = false
@@ -347,8 +347,15 @@ const loadMonitoringData = async () => {
 
     // Load real resource usage
     try {
-      const systemResponse = await axios.get('/api/v1/monitoring/system')
-      resourceUsage.value = systemResponse.data
+      const systemResponse = await apiService.monitoring.status()
+      const systemData = systemResponse.data.components?.system
+      if (systemData && systemData.status === 'healthy') {
+        resourceUsage.value = {
+          cpu: systemData.cpu_percent || 0,
+          memory: systemData.memory?.percent || 0,
+          disk: systemData.disk?.percent || 0
+        }
+      }
     } catch (error) {
       console.error('Failed to load system metrics:', error)
       // Fallback to simulated values
@@ -406,7 +413,7 @@ const viewLogs = (agent) => {
 
 const restartAgent = async (agent) => {
   try {
-    await axios.post(`/api/v1/agents/${agent.id}/restart`)
+    await apiService.agents.restart(agent.id)
     await loadMonitoringData()
   } catch (error) {
     console.error('Failed to restart agent:', error)

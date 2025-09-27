@@ -96,7 +96,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import axios from 'axios'
+import { apiService } from '@/services/api'
 import { formatRelativeTime } from '@/utils/datetime'
 
 const stats = ref({
@@ -114,21 +114,21 @@ const loadDashboardData = async () => {
   loading.value = true
   try {
     // Load scripts count
-    const scriptsResponse = await axios.get('/api/v1/scripts/')
+    const scriptsResponse = await apiService.scripts.list()
     const scripts = scriptsResponse.data
 
     // Load agents count (and active agents)
-    const agentsResponse = await axios.get('/api/v1/agents/')
+    const agentsResponse = await apiService.agents.list()
     const agents = agentsResponse.data
     const activeAgents = agents.filter(agent => agent.status === 'running')
 
     // Load jobs count (and active jobs)
-    const jobsResponse = await axios.get('/api/v1/jobs/')
+    const jobsResponse = await apiService.jobs.list()
     const jobs = jobsResponse.data
     const activeJobs = jobs.filter(job => job.is_active)
 
     // Load recent executions
-    const executionsResponse = await axios.get('/api/v1/monitoring/executions/recent?limit=10')
+    const executionsResponse = await apiService.monitoring.executions()
     const executions = executionsResponse.data
 
     // Update stats

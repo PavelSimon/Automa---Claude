@@ -58,7 +58,7 @@ class AgentService:
     async def get_agent(self, agent_id: int, user: User) -> Optional[Agent]:
         query = select(Agent).where(
             and_(Agent.id == agent_id, Agent.created_by == user.id)
-        ).options(selectinload(Agent.script))
+        ).options(selectinload(Agent.script), selectinload(Agent.jobs))
 
         result = await self.session.execute(query)
         return result.scalar_one_or_none()

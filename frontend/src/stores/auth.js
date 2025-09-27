@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import axios from 'axios'
+import { apiService, setAuthToken, clearCache } from '../services/api'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -16,20 +16,13 @@ export const useAuthStore = defineStore('auth', {
     async login(email, password) {
       this.isLoading = true
       try {
-        const response = await axios.post('/auth/jwt/login', {
-          username: email,
-          password: password
-        }, {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          }
-        })
+        const response = await apiService.auth.login(email, password)
 
         this.token = response.data.access_token
         localStorage.setItem('token', this.token)
 
-        // Set default authorization header
-        axios.defaults.headers.common['Authorization'] = `Bearer ${this.token}`
+        // Set authorization header
+        setAuthToken(this.token)
 
         // Fetch user data
         await this.fetchUser()
@@ -49,10 +42,7 @@ export const useAuthStore = defineStore('auth', {
     async register(email, password) {
       this.isLoading = true
       try {
-        await axios.post('/auth/register', {
-          email,
-          password
-        })
+        await apiService.auth.register(email, password)
 
         // Auto-login after registration
         return await this.login(email, password)
@@ -69,7 +59,7 @@ export const useAuthStore = defineStore('auth', {
 
     async fetchUser() {
       try {
-        const response = await axios.get('/users/me')
+        const response = await apiService.auth.me()
         this.user = response.data
       } catch (error) {
         console.error('Failed to fetch user:', error)
@@ -81,30 +71,17 @@ export const useAuthStore = defineStore('auth', {
       this.user = null
       this.token = null
       localStorage.removeItem('token')
-      delete axios.defaults.headers.common['Authorization']
+      setAuthToken(null)
+      clearCache()
     },
 
     async initializeAuth() {
       if (this.token) {
-        axios.defaults.headers.common['Authorization'] = `Bearer ${this.token}`
+        setAuthToken(this.token)
         await this.fetchUser()
       }
     }
   }
 })
 
-// Initialize axios interceptor for automatic logout on 401
-axios.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      // Only logout on auth endpoints, not on API errors
-      const url = error.config?.url || ''
-      if (url.includes('/auth/') || url.includes('/users/me')) {
-        const authStore = useAuthStore()
-        authStore.logout()
-      }
-    }
-    return Promise.reject(error)
-  }
-)
+// Auth error handling is now managed by the API service

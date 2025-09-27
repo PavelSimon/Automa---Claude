@@ -1,14 +1,76 @@
 import os
 import aiofiles
+from pathlib import Path
 from typing import List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from fastapi import UploadFile
+from fastapi import UploadFile, HTTPException
 from ..models.script import Script
 from ..models.user import User
 from ..schemas.script import ScriptCreate, ScriptUpdate
 from ..config import settings
 from ..core.audit import log_audit_event
+
+
+def _validate_file_path(file_path: str) -> str:
+    """
+    Validate and sanitize file paths to prevent path traversal attacks.
+    Returns absolute path if valid, raises HTTPException if invalid.
+    """
+    try:
+        # Convert to Path object and resolve
+        path = Path(file_path).resolve()
+
+        # Define allowed directories
+        scripts_dir = Path(settings.scripts_directory).resolve()
+        data_dir = Path(settings.data_directory).resolve()
+
+        # Check if path is within allowed directories
+        try:
+            # Check if path is under scripts directory
+            path.relative_to(scripts_dir)
+            return str(path)
+        except ValueError:
+            try:
+                # Check if path is under data directory
+                path.relative_to(data_dir)
+                return str(path)
+            except ValueError:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"File path must be within allowed directories: {scripts_dir} or {data_dir}"
+                )
+
+    except (OSError, ValueError) as e:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid file path: {str(e)}"
+        )
+
+
+def _sanitize_filename(filename: str) -> str:
+    """
+    Sanitize filename to prevent malicious filenames.
+    """
+    # Remove path separators and dangerous characters
+    dangerous_chars = ['/', '\\', '..', '<', '>', ':', '"', '|', '?', '*', '\0']
+    sanitized = filename
+
+    for char in dangerous_chars:
+        sanitized = sanitized.replace(char, '_')
+
+    # Ensure filename is not empty and has reasonable length
+    if not sanitized or len(sanitized) > 255:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid filename"
+        )
+
+    # Ensure it ends with .py
+    if not sanitized.endswith('.py'):
+        sanitized += '.py'
+
+    return sanitized
 
 
 class ScriptService:
@@ -31,32 +93,38 @@ class ScriptService:
         )
 
         if script_data.is_file_based and script_data.external_file_path:
-            # File-based script: use external file path
-            # Clean the path - remove surrounding quotes if present
+            # File-based script: use external file path with validation
             clean_path = script_data.external_file_path.strip().strip('"').strip("'")
+            validated_path = _validate_file_path(clean_path)
 
-            if os.path.exists(clean_path):
-                script.file_path = clean_path
-                script.external_file_path = clean_path
+            if os.path.exists(validated_path):
+                script.file_path = validated_path
+                script.external_file_path = validated_path
                 # Read content from external file for storage
-                async with aiofiles.open(clean_path, 'r', encoding='utf-8') as f:
+                async with aiofiles.open(validated_path, 'r', encoding='utf-8') as f:
                     script.content = await f.read()
             else:
-                raise FileNotFoundError(f"External script file not found: {clean_path}")
+                raise FileNotFoundError(f"External script file not found: {validated_path}")
         elif file:
-            # Uploaded file
-            file_path = os.path.join(settings.scripts_directory, f"{script_data.name}_{user.id}.py")
-            async with aiofiles.open(file_path, 'wb') as f:
+            # Uploaded file with filename sanitization
+            sanitized_name = _sanitize_filename(f"{script_data.name}_{user.id}")
+            file_path = os.path.join(settings.scripts_directory, sanitized_name)
+            validated_path = _validate_file_path(file_path)
+
+            async with aiofiles.open(validated_path, 'wb') as f:
                 content = await file.read()
                 await f.write(content)
-            script.file_path = file_path
+            script.file_path = validated_path
             script.is_file_based = True
         elif script_data.content:
-            # Inline content: create file in scripts directory
-            file_path = os.path.join(settings.scripts_directory, f"{script_data.name}_{user.id}.py")
-            async with aiofiles.open(file_path, 'w', encoding='utf-8') as f:
+            # Inline content: create file in scripts directory with validation
+            sanitized_name = _sanitize_filename(f"{script_data.name}_{user.id}")
+            file_path = os.path.join(settings.scripts_directory, sanitized_name)
+            validated_path = _validate_file_path(file_path)
+
+            async with aiofiles.open(validated_path, 'w', encoding='utf-8') as f:
                 await f.write(script_data.content)
-            script.file_path = file_path
+            script.file_path = validated_path
             script.is_file_based = False
 
         self.session.add(script)

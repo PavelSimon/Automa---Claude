@@ -16,7 +16,19 @@
       "Bash(tree:*)",
       "Bash(npm run build:*)",
       "Bash(git rm:*)",
-      "Bash(dir \"C:\\Users\\Admin\\Devel\\Automa - Claude\\scripts\")"
+      "Bash(dir \"C:\\Users\\Admin\\Devel\\Automa - Claude\\scripts\")",
+      "Bash(kill:*)",
+      "Bash(apt list:*)",
+      "Bash(sudo apt:*)",
+      "Bash(sudo apt install:*)",
+      "Bash(python3:*)",
+      "Bash(npm run lint)",
+      "Bash(git checkout:*)",
+      "Bash(chmod:*)",
+      "Bash(./run.sh:*)",
+      "Read(//home/pavel/**)",
+      "Bash(npm run test:*)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []

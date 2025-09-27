@@ -102,7 +102,7 @@ async def get_dashboard_data(
 # Alias endpoint for frontend compatibility
 @router.get("/executions/recent", response_model=List[JobExecutionWithDetailsRead])
 async def get_recent_executions(
-    limit: int = 10,
+    limit: int = 1000,
     session: AsyncSession = Depends(get_async_session),
     current_user: User = Depends(current_active_user),
 ):

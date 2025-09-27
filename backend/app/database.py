@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base
 from sqlalchemy.pool import StaticPool
 from .config import settings
 
@@ -7,7 +7,7 @@ engine = create_async_engine(
     settings.database_url,
     poolclass=StaticPool,
     connect_args={"check_same_thread": False} if "sqlite" in settings.database_url else {},
-    echo=True,
+    echo=settings.environment == "development",
 )
 
 async_session_maker = async_sessionmaker(engine, expire_on_commit=False)

@@ -14,7 +14,7 @@ class Script(Base):
     content = Column(Text)
     is_file_based = Column(Boolean, default=False)  # True if script uses external file, False if inline content
     external_file_path = Column(String(500))  # Path to external .py file if is_file_based=True
-    created_by = Column(Integer, ForeignKey("users.id"), nullable=False)
+    created_by = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 

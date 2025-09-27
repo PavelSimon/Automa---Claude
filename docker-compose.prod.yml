@@ -11,20 +11,55 @@ services:
     volumes:
       - ./backend/data:/app/data
       - ./backend/scripts:/app/scripts
-      - /var/run/docker.sock:/var/run/docker.sock  # DEVELOPMENT ONLY - Use docker-compose.prod.yml for production
+      # Use Docker-in-Docker instead of socket exposure for production
     environment:
-      - ENVIRONMENT=${ENVIRONMENT:-development}
+      - ENVIRONMENT=${ENVIRONMENT:-production}
       - DATABASE_URL=${DATABASE_URL:-sqlite+aiosqlite:///./data/automa.db}
       - SECRET_KEY=${SECRET_KEY}
-      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000,http://localhost:80}
+      - CORS_ORIGINS=${CORS_ORIGINS}
       - SANDBOX_IMAGE=${SANDBOX_IMAGE:-automa-sandbox:latest}
       - SANDBOX_MEMORY_LIMIT=${SANDBOX_MEMORY_LIMIT:-256m}
       - SANDBOX_CPU_LIMIT=${SANDBOX_CPU_LIMIT:-0.5}
       - SANDBOX_TIMEOUT=${SANDBOX_TIMEOUT:-300}
+      - DOCKER_HOST=tcp://docker-proxy:2375
     networks:
       - automa-network
     depends_on:
+      - docker-proxy
       - sandbox-builder
+
+  # Docker socket proxy for security
+  docker-proxy:
+    image: tecnativa/docker-socket-proxy:latest
+    container_name: automa-docker-proxy
+    environment:
+      - CONTAINERS=1
+      - IMAGES=1
+      - AUTH=0
+      - SECRETS=0
+      - POST=1
+      - BUILD=0
+      - COMMIT=0
+      - CONFIGS=0
+      - DISTRIBUTION=0
+      - EXEC=0
+      - GRPC=0
+      - INFO=0
+      - NETWORKS=0
+      - NODES=0
+      - PLUGINS=0
+      - SERVICES=0
+      - SESSION=0
+      - SWARM=0
+      - SYSTEM=0
+      - TASKS=0
+      - VERSION=0
+      - VOLUMES=0
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - automa-network
+    restart: unless-stopped
 
   frontend:
     build:
