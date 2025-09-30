@@ -183,7 +183,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
+import api from '@/services/api'
 import { formatDateTime } from '@/utils/datetime'
 import CredentialDialog from '@/components/CredentialDialog.vue'
 import CredentialViewDialog from '@/components/CredentialViewDialog.vue'
@@ -228,7 +228,7 @@ const loadCredentials = async () => {
     if (typeFilter.value) params.credential_type = typeFilter.value
     if (tagFilter.value?.length) params.tags = tagFilter.value
 
-    const response = await axios.get('/api/v1/credentials/', { params })
+    const response = await api.get('/api/v1/credentials/', { params })
     credentials.value = response.data
 
     // Extract unique tags
@@ -249,7 +249,7 @@ const loadCredentials = async () => {
 
 const loadCredentialTypes = async () => {
   try {
-    const response = await axios.get('/api/v1/credentials/types/')
+    const response = await api.get('/api/v1/credentials/types/')
     credentialTypes.value = response.data
   } catch (error) {
     console.error('Failed to load credential types:', error)
@@ -284,7 +284,7 @@ const deleteCredential = (credential) => {
 const confirmDelete = async () => {
   deleting.value = true
   try {
-    await axios.delete(`/api/v1/credentials/${selectedCredential.value.id}`)
+    await api.delete(`/api/v1/credentials/${selectedCredential.value.id}`)
     await loadCredentials()
     deleteDialogOpen.value = false
   } catch (error) {

@@ -64,7 +64,7 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
-import axios from 'axios'
+import api from '@/services/api'
 
 const props = defineProps({
   modelValue: Boolean,
@@ -100,7 +100,7 @@ const testCredential = async () => {
   testResult.value = null
 
   try {
-    const response = await axios.post(
+    const response = await api.post(
       `/api/v1/credentials/${props.credential.id}/test`,
       { user_password: userPassword.value }
     )

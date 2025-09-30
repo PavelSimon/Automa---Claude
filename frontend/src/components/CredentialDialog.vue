@@ -274,7 +274,7 @@
 
 <script setup>
 import { ref, computed, watch, nextTick } from 'vue'
-import axios from 'axios'
+import api from '@/services/api'
 
 const props = defineProps({
   modelValue: Boolean,
@@ -427,9 +427,9 @@ const saveCredential = async () => {
     }
 
     if (isEditing.value) {
-      await axios.put(`/api/v1/credentials/${props.credential.id}`, payload)
+      await api.put(`/api/v1/credentials/${props.credential.id}`, payload)
     } else {
-      await axios.post('/api/v1/credentials/', payload)
+      await api.post('/api/v1/credentials/', payload)
     }
 
     emit('saved')

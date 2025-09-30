@@ -28,7 +28,9 @@
       "Bash(./run.sh:*)",
       "Read(//home/pavel/**)",
       "Bash(npm run test:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(sudo usermod:*)",
+      "Bash(docker build:*)"
     ],
     "deny": [],
     "ask": []

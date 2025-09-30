@@ -22,7 +22,7 @@ class Agent(Base):
     # Relationships
     script = relationship("Script", back_populates="agents")
     creator = relationship("User", backref="agents")
-    jobs = relationship("Job", back_populates="agent")
+    jobs = relationship("Job", back_populates="agent", cascade="all, delete-orphan")
 
     @property
     def is_deleted(self):

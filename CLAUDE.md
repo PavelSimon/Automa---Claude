@@ -183,6 +183,7 @@ Based on project requirements:
 
 ## Recent Updates
 
+<<<<<<< HEAD
 ### Phase 3: Performance Optimization (2025-09-30 - Latest)
 16. **Performance & Real-time Communication**:
    - ✅ Implemented Redis cache layer with fallback support
@@ -229,6 +230,10 @@ Based on project requirements:
    ```
 
 14. **Database & Performance Optimization** (2025-09-30):
+=======
+### Phase 2: Stabilization - Database Optimization (2025-09-30 - Latest)
+14. **Database & Performance Optimization**:
+>>>>>>> parent of ca177dc (Database schema migration: Add soft delete support)
    - ✅ Added composite indexes for frequently queried columns
    - ✅ Implemented soft delete pattern for critical entities (Script, Agent, Job)
    - ✅ Fixed CredentialDialog.vue initialization error

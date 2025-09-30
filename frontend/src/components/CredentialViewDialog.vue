@@ -171,7 +171,7 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
-import axios from 'axios'
+import api from '@/services/api'
 import { formatDateTime } from '@/utils/datetime'
 
 const props = defineProps({
@@ -210,7 +210,7 @@ const decryptCredential = async () => {
   decryptError.value = ''
 
   try {
-    const response = await axios.post(
+    const response = await api.post(
       `/api/v1/credentials/${props.credential.id}/decrypt`,
       { user_password: userPassword.value }
     )
