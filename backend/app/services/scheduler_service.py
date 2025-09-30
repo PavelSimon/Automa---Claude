@@ -29,7 +29,7 @@ class SchedulerService:
 
     def _job_error_listener(self, event):
         """Listen for scheduler errors"""
-        if event.exception:
+        if hasattr(event, 'exception') and event.exception:
             logger.error(f"Job {event.job_id} failed: {event.exception}")
 
     async def start(self):
@@ -45,9 +45,12 @@ class SchedulerService:
 
     async def _load_all_jobs(self):
         """Load all active jobs from database"""
+        from ..models.agent import Agent
+        from ..models.script import Script
+
         async with AsyncSessionLocal() as session:
             query = select(Job).where(Job.is_active == True).options(
-                selectinload(Job.agent).selectinload(Job.agent.script)
+                selectinload(Job.agent).selectinload(Agent.script)
             )
             result = await session.execute(query)
             jobs = result.scalars().all()

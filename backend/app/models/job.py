@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, Boolean, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, Text, Boolean, DateTime, ForeignKey, Index
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from ..database import Base
@@ -6,6 +6,11 @@ from ..database import Base
 
 class Job(Base):
     __tablename__ = "jobs"
+    __table_args__ = (
+        Index('ix_job_active_nextrun', 'is_active', 'next_run'),
+        Index('ix_job_user_active', 'created_by', 'is_active'),
+        Index('ix_job_agent_active', 'agent_id', 'is_active'),
+    )
 
     id = Column(Integer, primary_key=True, index=True)
     agent_id = Column(Integer, ForeignKey("agents.id"), nullable=False, index=True)
@@ -18,15 +23,25 @@ class Job(Base):
     created_by = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    deleted_at = Column(DateTime(timezone=True), nullable=True, index=True)  # Soft delete
 
     # Relationships
     agent = relationship("Agent", back_populates="jobs")
     creator = relationship("User", backref="jobs")
     executions = relationship("JobExecution", back_populates="job")
 
+    @property
+    def is_deleted(self):
+        """Check if job is soft deleted"""
+        return self.deleted_at is not None
+
 
 class JobExecution(Base):
     __tablename__ = "job_executions"
+    __table_args__ = (
+        Index('ix_execution_job_started', 'job_id', 'started_at'),
+        Index('ix_execution_status_started', 'status', 'started_at'),
+    )
 
     id = Column(Integer, primary_key=True, index=True)
     job_id = Column(Integer, ForeignKey("jobs.id"), nullable=False, index=True)

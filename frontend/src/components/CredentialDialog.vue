@@ -319,6 +319,25 @@ const customDataText = ref('')
 
 const isEditing = computed(() => !!props.credential)
 
+// Helper functions (must be defined before watch)
+const resetForm = () => {
+  formData.value = {
+    name: '',
+    description: '',
+    credential_type: '',
+    tags: [],
+    expires_at: ''
+  }
+  credentialData.value = {}
+  userPassword.value = ''
+  resetTypeSpecificFields()
+}
+
+const resetTypeSpecificFields = () => {
+  headersText.value = ''
+  customDataText.value = ''
+}
+
 // Watch for credential changes
 watch(() => props.credential, (newCredential) => {
   if (newCredential) {
@@ -354,24 +373,6 @@ watch(dialog, (isOpen) => {
 const onTypeChange = () => {
   credentialData.value = {}
   resetTypeSpecificFields()
-}
-
-const resetForm = () => {
-  formData.value = {
-    name: '',
-    description: '',
-    credential_type: '',
-    tags: [],
-    expires_at: ''
-  }
-  credentialData.value = {}
-  userPassword.value = ''
-  resetTypeSpecificFields()
-}
-
-const resetTypeSpecificFields = () => {
-  headersText.value = ''
-  customDataText.value = ''
 }
 
 const resetVisibilityToggles = () => {

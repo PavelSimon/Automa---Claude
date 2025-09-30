@@ -17,7 +17,13 @@ class Script(Base):
     created_by = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    deleted_at = Column(DateTime(timezone=True), nullable=True, index=True)  # Soft delete
 
     # Relationships
     creator = relationship("User", backref="scripts")
     agents = relationship("Agent", back_populates="script")
+
+    @property
+    def is_deleted(self):
+        """Check if script is soft deleted"""
+        return self.deleted_at is not None

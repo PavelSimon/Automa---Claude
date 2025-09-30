@@ -12,6 +12,26 @@ from ..core.deps import current_active_user
 router = APIRouter(prefix="/monitoring", tags=["monitoring"])
 
 
+@router.get("/status")
+async def get_monitoring_status(
+    session: AsyncSession = Depends(get_async_session),
+    current_user: User = Depends(current_active_user),
+):
+    """Get overall monitoring status (system + docker)"""
+    monitoring_service = MonitoringService(session)
+    try:
+        system_status = await monitoring_service.get_system_status()
+        docker_status = await monitoring_service.get_docker_status()
+
+        return {
+            "system": system_status,
+            "docker": docker_status,
+            "timestamp": system_status.get("timestamp")
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get monitoring status: {str(e)}")
+
+
 @router.get("/docker")
 async def get_docker_status(
     session: AsyncSession = Depends(get_async_session),
