@@ -63,15 +63,17 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useTheme } from 'vuetify'
 import { useAuthStore } from './stores/auth'
 import { useThemeStore } from './stores/theme'
+import { useWebSocketStore } from './stores/websocket'
 
 const router = useRouter()
 const authStore = useAuthStore()
 const themeStore = useThemeStore()
+const websocketStore = useWebSocketStore()
 const theme = useTheme()
 
 const drawer = ref(true)
@@ -102,6 +104,22 @@ onMounted(() => {
       themeStore.initializeFromUser(user.dark_mode)
     }
   }, { immediate: true })
+
+  // Connect WebSocket when authenticated
+  watch(isAuthenticated, (newValue) => {
+    if (newValue) {
+      websocketStore.connect()
+      websocketStore.startKeepalive()
+    } else {
+      websocketStore.stopKeepalive()
+      websocketStore.disconnect()
+    }
+  }, { immediate: true })
+})
+
+onUnmounted(() => {
+  websocketStore.stopKeepalive()
+  websocketStore.disconnect()
 })
 
 const logout = async () => {

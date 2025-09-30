@@ -11,7 +11,7 @@ from .database import create_db_and_tables
 from .config import settings
 from .core.deps import fastapi_users, auth_backend
 from .schemas.user import UserRead, UserCreate
-from .api import scripts, agents, jobs, monitoring, profile, health, credentials
+from .api import scripts, agents, jobs, monitoring, profile, health, credentials, websocket
 from .core.exceptions import (
     AutomaException,
     http_exception_handler,
@@ -20,6 +20,7 @@ from .core.exceptions import (
     general_exception_handler
 )
 from .services.scheduler_service import init_scheduler, shutdown_scheduler
+from .core.cache import close_redis
 
 # Initialize rate limiter
 limiter = Limiter(key_func=get_remote_address)
@@ -33,6 +34,7 @@ async def lifespan(app: FastAPI):
     yield
     # Shutdown
     shutdown_scheduler()
+    await close_redis()
 
 
 app = FastAPI(
@@ -90,6 +92,9 @@ app.include_router(credentials.router, prefix="/api/v1")
 
 # Health and monitoring routes (no auth required)
 app.include_router(health.router, tags=["health"])
+
+# WebSocket route (no auth required - handles connection internally)
+app.include_router(websocket.router, tags=["websocket"])
 
 
 @app.get("/")

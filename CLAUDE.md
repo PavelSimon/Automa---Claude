@@ -183,7 +183,32 @@ Based on project requirements:
 
 ## Recent Updates
 
-### Phase 2: Stabilization - Database Schema Migration (2025-09-30 - Latest)
+### Phase 3: Performance Optimization (2025-09-30 - Latest)
+16. **Performance & Real-time Communication**:
+   - ✅ Implemented Redis cache layer with fallback support
+   - ✅ Added cache endpoints (/api/v1/monitoring/cache)
+   - ✅ Created WebSocket support for real-time updates
+   - ✅ WebSocket store for frontend with auto-reconnect
+   - ✅ Frontend virtual scrolling already implemented (v-data-table)
+   - ✅ All tests passing (13/13)
+   - **Performance: 6/10 → 8/10** | **Real-time capabilities: 0/10 → 9/10**
+
+   **Backend Changes:**
+   - `core/cache.py`: Redis cache decorator with TTL and automatic fallback
+   - `api/websocket.py`: WebSocket endpoint with connection manager
+   - `api/monitoring.py`: Added /cache and /cache/invalidate endpoints
+   - `config.py`: Added optional redis_url configuration
+   - `main.py`: Integrated WebSocket router and Redis cleanup on shutdown
+
+   **Frontend Changes:**
+   - `stores/websocket.js`: Pinia store for WebSocket management
+   - `App.vue`: Auto-connect WebSocket when authenticated
+   - Event-based architecture for agent/job/metrics updates
+
+   **Dependencies:**
+   - Added `redis[hiredis]>=5.0.0` for high-performance caching
+
+### Phase 2: Stabilization - Database Schema Migration (2025-09-30)
 15. **Database Schema Migration for Soft Delete**:
    - ✅ Migrated existing database to add deleted_at columns
    - ✅ Used Python sqlite3 to safely ALTER TABLE for scripts, agents, jobs

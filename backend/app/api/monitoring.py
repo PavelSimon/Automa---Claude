@@ -8,6 +8,7 @@ from ..services.job_service import JobService
 from ..services.agent_service import AgentService
 from ..services.monitoring_service import MonitoringService
 from ..core.deps import current_active_user
+from ..core.cache import get_cache_stats, invalidate_cache
 
 router = APIRouter(prefix="/monitoring", tags=["monitoring"])
 
@@ -148,3 +149,22 @@ async def get_recent_executions(
         result.append(JobExecutionWithDetailsRead(**data))
 
     return result
+
+
+@router.get("/cache")
+async def get_cache_statistics(
+    current_user: User = Depends(current_active_user),
+):
+    """Get Redis cache statistics and status"""
+    return await get_cache_stats()
+
+
+@router.post("/cache/invalidate")
+async def invalidate_cache_endpoint(
+    pattern: str = "*",
+    current_user: User = Depends(current_active_user),
+):
+    """Invalidate cache entries matching pattern (admin only)"""
+    # TODO: Add admin-only check when roles are implemented
+    await invalidate_cache(pattern)
+    return {"message": f"Cache invalidated for pattern: {pattern}"}

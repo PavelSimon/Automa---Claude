@@ -27,6 +27,9 @@ class Settings(BaseSettings):
     scripts_directory: str = "./scripts"
     data_directory: str = "./data"
 
+    # Redis cache (optional)
+    redis_url: str = ""  # Example: redis://localhost:6379/0
+
     # CORS settings
     cors_origins: list[str] = ["http://localhost:8002", "http://localhost:8080"]
 
