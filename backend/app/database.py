@@ -12,6 +12,9 @@ engine = create_async_engine(
 
 async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
 
+# Alias for compatibility with scheduler_service
+AsyncSessionLocal = async_session_maker
+
 Base = declarative_base()
 
 

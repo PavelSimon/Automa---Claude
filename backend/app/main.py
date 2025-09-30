@@ -19,6 +19,7 @@ from .core.exceptions import (
     sqlalchemy_exception_handler,
     general_exception_handler
 )
+from .services.scheduler_service import init_scheduler, shutdown_scheduler
 
 # Initialize rate limiter
 limiter = Limiter(key_func=get_remote_address)
@@ -28,8 +29,10 @@ limiter = Limiter(key_func=get_remote_address)
 async def lifespan(app: FastAPI):
     # Startup
     await create_db_and_tables()
+    await init_scheduler()
     yield
     # Shutdown
+    shutdown_scheduler()
 
 
 app = FastAPI(

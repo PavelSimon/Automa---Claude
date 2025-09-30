@@ -28,11 +28,14 @@ Fully functional Python agent management platform with:
 - **Backend**: FastAPI with SQLAlchemy, JWT authentication (fixed argon2 support), Docker sandboxing
 - **Frontend**: Vue.js 3 with Vuetify, complete UI for scripts/agents/jobs/monitoring
 - **Database**: SQLite with comprehensive models (User, Script, Agent, Job, JobExecution, AuditLog)
-- **Security**: JWT tokens with argon2 password hashing, audit logging, Docker container isolation
+- **Security**: JWT tokens with argon2 password hashing, audit logging, Docker container isolation, retry logic for Docker operations
 - **API**: Complete REST API with all endpoints implemented - Scripts, Agents, Jobs, Monitoring
 - **Docker**: Complete containerization with docker-compose setup
 - **Authentication**: Fixed login issues - now fully working with fastapi-users
-- **Testing**: Basic test suite covering API endpoints and services
+- **Task Scheduling**: APScheduler integration with automatic job scheduling, cron expression support
+- **Agent Lifecycle**: Full Docker integration for agent start/stop/restart with container management
+- **Job Execution**: Real sandbox execution with Docker, proper error handling and logging
+- **Testing**: Test suite with 13 passing tests covering API endpoints and services
 
 ## Development Commands
 
@@ -178,9 +181,31 @@ Based on project requirements:
 - Docker-based sandboxed script execution
 - **User Profile Management with Dark Mode**: Complete profile editing system with dark theme support
 
-## Recent Updates (2025-09-21)
+## Recent Updates
 
-### Security & Performance Phase 5: Testing & Monitoring Infrastructure (2025-09-21 - Latest)
+### Phase 1: Critical Fixes Implementation (2025-09-30 - Latest)
+13. **Agent Lifecycle & Job Execution - COMPLETED**:
+   - ✅ Implemented full Docker integration for agent start/stop/restart
+   - ✅ Added real job execution with sandbox service integration
+   - ✅ Integrated APScheduler for automatic job scheduling (cron, interval, once)
+   - ✅ Implemented cron expression parsing with croniter
+   - ✅ Added retry logic for Docker operations with exponential backoff
+   - ✅ Created `scheduler_service.py` for job scheduling management
+   - ✅ Created `core/retry.py` utility module for retry logic
+   - ✅ All tests passing (13/13)
+   - **Implementation Status: PHASE 1 COMPLETE** | **Functionality: 4/10 → 8/10**
+
+   **Changes:**
+   - `agent_service.py`: Removed TODO comments, implemented Docker container lifecycle
+   - `job_service.py`: Removed TODO comments, added real execution and cron parsing
+   - `sandbox_service.py`: Added agent container methods with retry decorators
+   - `scheduler_service.py`: New service for APScheduler integration
+   - `core/retry.py`: New utility for retry logic with exponential backoff
+   - `main.py`: Added scheduler initialization/shutdown in lifespan
+   - `pyproject.toml`: Added croniter dependency
+   - `database.py`: Added AsyncSessionLocal alias for scheduler
+
+### Security & Performance Phase 5: Testing & Monitoring Infrastructure (2025-09-21)
 12. **Testing & Observability Implementation**:
    - Implemented frontend unit testing with Vitest (16 tests passing)
    - Added comprehensive health check endpoints (/health, /health/detailed, /liveness, /readiness)

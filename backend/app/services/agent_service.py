@@ -109,20 +109,57 @@ class AgentService:
         if not agent:
             return None
 
-        # TODO: Implement actual agent starting logic with Docker/sandbox
-        agent.status = "running"
+        # Check if agent has a script assigned
+        if not agent.script:
+            raise ValueError("Agent has no script assigned")
 
-        await self.session.commit()
-        await self.session.refresh(agent)
+        # Check if agent is already running
+        if agent.status == "running":
+            return agent
 
-        await log_action(
-            self.session,
-            user_id=user.id,
-            action="start",
-            resource_type="agent",
-            resource_id=agent.id,
-            details={"name": agent.name}
-        )
+        # Start the agent in Docker sandbox
+        from .sandbox_service import SandboxService
+        sandbox = SandboxService()
+
+        try:
+            # For long-running agents, start container in detached mode
+            container_id = await sandbox.start_agent_container(
+                script=agent.script,
+                agent_id=agent.id,
+                config=agent.config_json or {}
+            )
+
+            # Update agent status and store container ID
+            agent.status = "running"
+            agent.config_json = agent.config_json or {}
+            agent.config_json["container_id"] = container_id
+
+            await self.session.commit()
+            await self.session.refresh(agent)
+
+            await log_action(
+                self.session,
+                user_id=user.id,
+                action="start",
+                resource_type="agent",
+                resource_id=agent.id,
+                details={"name": agent.name, "container_id": container_id}
+            )
+
+        except Exception as e:
+            agent.status = "error"
+            await self.session.commit()
+            await self.session.refresh(agent)
+
+            await log_action(
+                self.session,
+                user_id=user.id,
+                action="start_failed",
+                resource_type="agent",
+                resource_id=agent.id,
+                details={"name": agent.name, "error": str(e)}
+            )
+            raise
 
         return agent
 
@@ -131,9 +168,36 @@ class AgentService:
         if not agent:
             return None
 
-        # TODO: Implement actual agent stopping logic
-        agent.status = "stopped"
+        # Check if agent is already stopped
+        if agent.status == "stopped":
+            return agent
 
+        # Stop the Docker container if it exists
+        container_id = None
+        if agent.config_json and "container_id" in agent.config_json:
+            container_id = agent.config_json["container_id"]
+
+            from .sandbox_service import SandboxService
+            sandbox = SandboxService()
+
+            try:
+                await sandbox.stop_agent_container(container_id)
+
+                # Remove container_id from config
+                del agent.config_json["container_id"]
+
+            except Exception as e:
+                # Log error but continue with status update
+                await log_action(
+                    self.session,
+                    user_id=user.id,
+                    action="stop_container_failed",
+                    resource_type="agent",
+                    resource_id=agent.id,
+                    details={"name": agent.name, "container_id": container_id, "error": str(e)}
+                )
+
+        agent.status = "stopped"
         await self.session.commit()
         await self.session.refresh(agent)
 
@@ -143,7 +207,7 @@ class AgentService:
             action="stop",
             resource_type="agent",
             resource_id=agent.id,
-            details={"name": agent.name}
+            details={"name": agent.name, "container_id": container_id}
         )
 
         return agent
