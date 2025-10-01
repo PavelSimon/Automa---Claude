@@ -196,6 +196,23 @@ Based on project requirements:
    - `vite.config.js`: Added `/ws` proxy with WebSocket support (ws: true)
    - `stores/websocket.js`: Changed URL from `${host}:8001` to `${host}` (uses current port)
 
+21. **Agent Logs Viewer Implementation** (2025-10-01):
+   - ✅ Implemented fully functional agent logs viewer in monitoring page
+   - ✅ Displays recent job executions for each agent (up to 5 per job)
+   - ✅ Shows execution details: status, exit code, output, and error logs
+   - ✅ Responsive dialog with scrollable content
+   - **Functionality: 7/10 → 9/10**
+
+   **Root Cause:** The "View Logs" button in monitoring had only a console.log with TODO comment - no actual implementation.
+
+   **Changes:**
+   - `frontend/src/views/MonitoringView.vue`: Implemented `viewLogs()` function that:
+     - Fetches agent details and all associated jobs
+     - Loads recent executions for each job
+     - Formats comprehensive log output with timestamps, status, and execution data
+   - Added agent logs dialog with proper formatting and scrollable content
+   - Agent logs now show complete execution history with output and errors
+
 20. **WebSocket Ping/Pong Parse Error Fix** (2025-10-01):
    - ✅ Fixed JSON parse error for ping/pong WebSocket messages
    - ✅ Added filter to skip non-JSON keepalive messages

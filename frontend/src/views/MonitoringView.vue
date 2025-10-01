@@ -177,6 +177,38 @@
       </v-col>
     </v-row>
 
+    <!-- Agent Logs Dialog -->
+    <v-dialog v-model="logsDialog" max-width="900" scrollable>
+      <v-card v-if="selectedAgent">
+        <v-card-title>
+          <span class="text-h5">Agent Logs: {{ selectedAgent.name }}</span>
+          <v-spacer></v-spacer>
+          <v-chip
+            :color="getStatusColor(selectedAgent.status)"
+            small
+          >
+            <v-icon left>{{ getStatusIcon(selectedAgent.status) }}</v-icon>
+            {{ selectedAgent.status }}
+          </v-chip>
+        </v-card-title>
+
+        <v-divider></v-divider>
+
+        <v-card-text style="max-height: 600px">
+          <v-card outlined>
+            <v-card-text>
+              <pre class="text-body-2" style="white-space: pre-wrap; font-family: 'Courier New', monospace;">{{ agentLogs }}</pre>
+            </v-card-text>
+          </v-card>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" @click="logsDialog = false">Close</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <!-- Execution Details Dialog -->
     <v-dialog v-model="executionDialog" max-width="800">
       <v-card v-if="selectedExecution">
@@ -264,6 +296,9 @@ const recentExecutions = ref([])
 const refreshInterval = ref(null)
 const executionDialog = ref(false)
 const selectedExecution = ref(null)
+const logsDialog = ref(false)
+const selectedAgent = ref(null)
+const agentLogs = ref('')
 
 const resourceUsage = ref({
   cpu: 25,
@@ -406,9 +441,65 @@ const loadMonitoringData = async () => {
   }
 }
 
-const viewLogs = (agent) => {
-  console.log(`Viewing logs for agent: ${agent.name}`)
-  // TODO: Implement logs viewer
+const viewLogs = async (agent) => {
+  selectedAgent.value = agent
+  agentLogs.value = 'Loading logs...'
+  logsDialog.value = true
+
+  try {
+    // Get recent job executions for this agent
+    const response = await apiService.agents.get(agent.id)
+    const agentData = response.data
+
+    // Get jobs for this agent
+    const jobsResponse = await apiService.jobs.list(0, 100)
+    const agentJobs = jobsResponse.data.filter(job => job.agent_id === agent.id)
+
+    if (agentJobs.length === 0) {
+      agentLogs.value = `No jobs found for agent "${agent.name}"`
+      return
+    }
+
+    // Get executions for all jobs
+    let allLogs = `Agent: ${agent.name}\nStatus: ${agent.status}\n\n`
+    allLogs += `=== Recent Executions ===\n\n`
+
+    for (const job of agentJobs) {
+      try {
+        const executionsResponse = await apiService.jobs.executions(job.id)
+        const executions = executionsResponse.data
+
+        if (executions.length > 0) {
+          allLogs += `Job: ${job.name}\n`
+          executions.slice(0, 5).forEach((exec, idx) => {
+            allLogs += `\nExecution #${exec.id} (${formatDateTime(exec.started_at)})\n`
+            allLogs += `Status: ${exec.status}\n`
+            if (exec.exit_code !== null) {
+              allLogs += `Exit Code: ${exec.exit_code}\n`
+            }
+            if (exec.output) {
+              allLogs += `Output:\n${exec.output}\n`
+            }
+            if (exec.error_log) {
+              allLogs += `Error:\n${exec.error_log}\n`
+            }
+            allLogs += `${'='.repeat(50)}\n`
+          })
+        }
+      } catch (error) {
+        console.error(`Failed to load executions for job ${job.id}:`, error)
+      }
+    }
+
+    if (allLogs.split('===').length <= 2) {
+      agentLogs.value = `No execution logs found for agent "${agent.name}"`
+    } else {
+      agentLogs.value = allLogs
+    }
+  } catch (error) {
+    console.error('Failed to load agent logs:', error)
+    agentLogs.value = `Failed to load logs: ${error.message}`
+  }
 }
 
 const restartAgent = async (agent) => {
