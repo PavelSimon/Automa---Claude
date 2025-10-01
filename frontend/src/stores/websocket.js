@@ -45,6 +45,10 @@ export const useWebSocketStore = defineStore('websocket', () => {
 
       socket.value.onmessage = (event) => {
         try {
+          // Skip ping/pong messages
+          if (event.data === 'ping' || event.data === 'pong') {
+            return
+          }
           const data = JSON.parse(event.data)
           handleMessage(data)
         } catch (error) {

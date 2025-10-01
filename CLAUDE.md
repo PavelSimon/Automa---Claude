@@ -196,6 +196,17 @@ Based on project requirements:
    - `vite.config.js`: Added `/ws` proxy with WebSocket support (ws: true)
    - `stores/websocket.js`: Changed URL from `${host}:8001` to `${host}` (uses current port)
 
+20. **WebSocket Ping/Pong Parse Error Fix** (2025-10-01):
+   - ✅ Fixed JSON parse error for ping/pong WebSocket messages
+   - ✅ Added filter to skip non-JSON keepalive messages
+   - **Console Cleanliness: 6/10 → 9/10**
+
+   **Root Cause:** WebSocket store was attempting to JSON.parse() ping/pong keepalive messages, causing "Unexpected token 'p', 'pong' is not valid JSON" errors.
+
+   **Changes:**
+   - `frontend/src/stores/websocket.js`: Added check to skip ping/pong messages before JSON parsing
+   - Console now clean without WebSocket parse errors
+
 19. **Job Execution Async/Await Fix** (2025-10-01):
    - ✅ Fixed 500 Internal Server Error when executing jobs
    - ✅ Resolved SQLAlchemy greenlet error: "greenlet_spawn has not been called"
