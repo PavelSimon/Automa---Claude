@@ -183,7 +183,20 @@ Based on project requirements:
 
 ## Recent Updates
 
-### Phase 2: Stabilization - Token Warning & Optimization (2025-10-01 - Latest)
+### Phase 2: Stabilization - Token Warning & Docker Sandbox (2025-10-01 - Latest)
+16. **Fixed Docker Sandbox Image Build**:
+   - ✅ Fixed uv installation PATH in Dockerfile.sandbox
+   - ✅ Changed from `uv add` to `uv pip install` for package installation
+   - ✅ Successfully built automa-sandbox:latest image (403MB)
+   - ✅ Resolves 500 Internal Server Error on agent start/job execution
+   - ✅ Image includes: Python 3.13, requests, beautifulsoup4, pandas, numpy
+   - **Deployment Readiness: 6/10 → 9/10**
+
+   **Changes:**
+   - `docker/Dockerfile.sandbox`: Fixed PATH from `/root/.cargo/bin` to `/root/.local/bin`
+   - Changed package installation command to `uv pip install`
+   - Image now builds successfully and is ready for agent execution
+
 15. **JWT Token Expiration Warning System**:
    - ✅ Implemented comprehensive token expiration tracking in auth store
    - ✅ Added automatic expiration check with 1-minute intervals

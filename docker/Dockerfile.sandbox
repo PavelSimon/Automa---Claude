@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y \
 
 # Install uv
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
-ENV PATH="/root/.cargo/bin:$PATH"
+ENV PATH="/root/.local/bin:$PATH"
 
 # Create non-root user for sandbox
 RUN groupadd -r sandbox && useradd -r -g sandbox sandbox
@@ -18,7 +18,7 @@ RUN uv venv .venv
 ENV PATH="/app/.venv/bin:$PATH"
 
 # Install minimal Python packages that might be commonly needed
-RUN uv add requests beautifulsoup4 pandas numpy
+RUN uv pip install requests beautifulsoup4 pandas numpy
 
 # Change ownership to sandbox user
 RUN chown -R sandbox:sandbox /app
