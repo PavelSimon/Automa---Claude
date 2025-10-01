@@ -196,6 +196,19 @@ Based on project requirements:
    - `vite.config.js`: Added `/ws` proxy with WebSocket support (ws: true)
    - `stores/websocket.js`: Changed URL from `${host}:8001` to `${host}` (uses current port)
 
+19. **Job Execution Async/Await Fix** (2025-10-01):
+   - ✅ Fixed 500 Internal Server Error when executing jobs
+   - ✅ Resolved SQLAlchemy greenlet error: "greenlet_spawn has not been called"
+   - ✅ Added proper eager loading for agent.script relationship
+   - **Reliability: 7/10 → 9/10**
+
+   **Root Cause:** `get_job()` method was loading agent but not agent.script relationship. When `execute_job()` accessed `job.agent.script`, SQLAlchemy attempted lazy loading in async context, causing greenlet error.
+
+   **Changes:**
+   - `backend/app/services/job_service.py`: Added `selectinload(Agent.script)` to `get_job()` query
+   - Prevents lazy loading by eagerly fetching all required relationships
+   - Job execution now works without 500 errors
+
 18. **Frontend Cache Invalidation Fix** (2025-10-01):
    - ✅ Fixed agent/job status not refreshing after start/stop/create operations
    - ✅ Re-implemented cache invalidation in API interceptor for POST/PUT/DELETE/PATCH requests
