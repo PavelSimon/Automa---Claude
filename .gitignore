@@ -36,3 +36,9 @@ scripts/
 
 # súbory dát
 data/
+
+# Coverage reports
+.coverage
+coverage.json
+htmlcov/
+.pytest_cache/
