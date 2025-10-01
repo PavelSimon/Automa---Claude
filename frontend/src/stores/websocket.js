@@ -28,11 +28,11 @@ export const useWebSocketStore = defineStore('websocket', () => {
     }
 
     try {
-      // Determine WebSocket URL based on current location
+      // Use relative URL to leverage Vite proxy in development
+      // In production, this will be resolved to the actual host
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-      const host = window.location.hostname
-      const port = import.meta.env.VITE_API_PORT || '8001'
-      const wsUrl = `${protocol}//${host}:${port}/ws`
+      const host = window.location.host // includes port (e.g., 192.168.1.40:8002)
+      const wsUrl = `${protocol}//${host}/ws`
 
       console.log('Connecting to WebSocket:', wsUrl)
       socket.value = new WebSocket(wsUrl)

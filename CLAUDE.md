@@ -184,15 +184,17 @@ Based on project requirements:
 ## Recent Updates
 
 ### Phase 2: Stabilization - Token Warning & Docker Sandbox (2025-10-01 - Latest)
-18. **Added WebSocket Proxy Configuration**:
+18. **Fixed WebSocket Connection via Vite Proxy**:
    - ✅ Added `/ws` proxy route in vite.config.js for WebSocket support
    - ✅ Configured WebSocket proxy with `ws: true` flag
-   - ✅ Resolves WebSocket connection failures to backend
-   - ✅ Enables real-time updates for agent status and job execution
-   - **Real-time Features: 0/10 → 8/10**
+   - ✅ Fixed WebSocket URL to use window.location.host instead of hardcoded port
+   - ✅ WebSocket now correctly proxies through Vite dev server (port 8002 → 8001)
+   - ✅ Resolves WebSocket connection failures and enables real-time updates
+   - **Real-time Features: 0/10 → 9/10**
 
    **Changes:**
    - `vite.config.js`: Added `/ws` proxy with WebSocket support (ws: true)
+   - `stores/websocket.js`: Changed URL from `${host}:8001` to `${host}` (uses current port)
 
 17. **Fixed Vuetify 3 Deprecation Warning in DashboardView**:
    - ✅ Removed deprecated `v-list-item-content` component
