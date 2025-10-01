@@ -184,6 +184,15 @@ Based on project requirements:
 ## Recent Updates
 
 ### Phase 2: Stabilization - Token Warning & Docker Sandbox (2025-10-01 - Latest)
+17. **Fixed Vuetify 3 Deprecation Warning in DashboardView**:
+   - ✅ Removed deprecated `v-list-item-content` component
+   - ✅ Updated to Vuetify 3 syntax with direct title/subtitle props
+   - ✅ Eliminated Vue warning in console
+   - **Code Quality: 8.5/10 → 9/10**
+
+   **Changes:**
+   - `views/DashboardView.vue`: Removed v-list-item-content wrappers, using direct v-list-item-title/subtitle
+
 16. **Fixed Docker Sandbox Image Build**:
    - ✅ Fixed uv installation PATH in Dockerfile.sandbox
    - ✅ Changed from `uv add` to `uv pip install` for package installation

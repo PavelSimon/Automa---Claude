@@ -55,15 +55,11 @@
           <v-card-text>
             <v-list v-if="!loading">
               <v-list-item v-for="activity in recentActivity" :key="activity.id">
-                <v-list-item-content>
-                  <v-list-item-title>{{ activity.action }}</v-list-item-title>
-                  <v-list-item-subtitle>{{ activity.timestamp }}</v-list-item-subtitle>
-                </v-list-item-content>
+                <v-list-item-title>{{ activity.action }}</v-list-item-title>
+                <v-list-item-subtitle>{{ activity.timestamp }}</v-list-item-subtitle>
               </v-list-item>
               <v-list-item v-if="recentActivity.length === 0">
-                <v-list-item-content>
-                  <v-list-item-title class="text-disabled">No recent activity</v-list-item-title>
-                </v-list-item-content>
+                <v-list-item-title class="text-disabled">No recent activity</v-list-item-title>
               </v-list-item>
             </v-list>
             <v-skeleton-loader v-else type="list-item-two-line@3"></v-skeleton-loader>
