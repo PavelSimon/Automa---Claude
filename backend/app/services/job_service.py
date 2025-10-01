@@ -74,9 +74,13 @@ class JobService:
         return result.scalars().all()
 
     async def get_job(self, job_id: int, user: User) -> Optional[Job]:
+        from ..models.agent import Agent
         query = select(Job).where(
             and_(Job.id == job_id, Job.created_by == user.id)
-        ).options(selectinload(Job.agent), selectinload(Job.executions))
+        ).options(
+            selectinload(Job.agent).selectinload(Agent.script),
+            selectinload(Job.executions)
+        )
 
         result = await self.session.execute(query)
         return result.scalar_one_or_none()

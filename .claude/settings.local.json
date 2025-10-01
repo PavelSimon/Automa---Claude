@@ -34,7 +34,10 @@
       "Bash(git revert:*)",
       "Bash(docker ps:*)",
       "Read(//tmp/**)",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "Bash(journalctl:*)",
+      "Bash(lsof:*)",
+      "Bash(xargs ps:*)"
     ],
     "deny": [],
     "ask": []
