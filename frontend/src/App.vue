@@ -59,6 +59,41 @@
         <router-view />
       </v-container>
     </v-main>
+
+    <!-- Token Expiration Warning -->
+    <v-snackbar
+      v-model="authStore.showExpirationWarning"
+      :timeout="-1"
+      color="warning"
+      location="top"
+      multi-line
+    >
+      <div class="d-flex align-center">
+        <v-icon class="mr-2">mdi-alert</v-icon>
+        <div>
+          <strong>Session Expiring Soon</strong>
+          <div class="text-caption">
+            Your session will expire in {{ authStore.tokenExpiresInMinutes }} minute(s).
+            Please save your work and login again.
+          </div>
+        </div>
+      </div>
+      <template v-slot:actions>
+        <v-btn
+          variant="text"
+          @click="authStore.dismissExpirationWarning()"
+        >
+          Dismiss
+        </v-btn>
+        <v-btn
+          variant="text"
+          color="primary"
+          @click="logout"
+        >
+          Re-login
+        </v-btn>
+      </template>
+    </v-snackbar>
   </v-app>
 </template>
 

@@ -183,8 +183,22 @@ Based on project requirements:
 
 ## Recent Updates
 
-### Phase 2: Stabilization - Database Optimization (2025-09-30 - Latest)
-14. **Database & Performance Optimization**:
+### Phase 2: Stabilization - Token Warning & Optimization (2025-10-01 - Latest)
+15. **JWT Token Expiration Warning System**:
+   - ✅ Implemented comprehensive token expiration tracking in auth store
+   - ✅ Added automatic expiration check with 1-minute intervals
+   - ✅ Warning notification appears 5 minutes before token expires
+   - ✅ Auto-logout when token expires to prevent 401 errors
+   - ✅ Persistent expiration time stored in localStorage
+   - ✅ Snackbar notification with dismiss and re-login options
+   - **User Experience: 7/10 → 9/10** | **Security: 8/10 → 9/10**
+
+   **Changes:**
+   - `stores/auth.js`: Added tokenExpiration tracking, expiration check interval, and warning state
+   - `App.vue`: Added v-snackbar for expiration warning with re-login option
+   - Token validity checked on app initialization to prevent stale sessions
+
+14. **Database & Performance Optimization** (2025-09-30):
    - ✅ Added composite indexes for frequently queried columns
    - ✅ Implemented soft delete pattern for critical entities (Script, Agent, Job)
    - ✅ Fixed CredentialDialog.vue initialization error

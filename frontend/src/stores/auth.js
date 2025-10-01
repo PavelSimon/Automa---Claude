@@ -5,11 +5,23 @@ export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: null,
     token: localStorage.getItem('token'),
-    isLoading: false
+    tokenExpiration: localStorage.getItem('tokenExpiration') ? parseInt(localStorage.getItem('tokenExpiration')) : null,
+    isLoading: false,
+    showExpirationWarning: false
   }),
 
   getters: {
-    isAuthenticated: (state) => !!state.token
+    isAuthenticated: (state) => !!state.token,
+    tokenExpiresIn: (state) => {
+      if (!state.tokenExpiration) return null
+      const now = Date.now()
+      const expiresIn = state.tokenExpiration - now
+      return expiresIn > 0 ? expiresIn : 0
+    },
+    tokenExpiresInMinutes: (state) => {
+      const expiresIn = state.tokenExpiresIn
+      return expiresIn ? Math.floor(expiresIn / 60000) : 0
+    }
   },
 
   actions: {
@@ -21,8 +33,16 @@ export const useAuthStore = defineStore('auth', {
         this.token = response.data.access_token
         localStorage.setItem('token', this.token)
 
+        // Calculate token expiration (30 minutes from now)
+        const expirationTime = Date.now() + (30 * 60 * 1000)
+        this.tokenExpiration = expirationTime
+        localStorage.setItem('tokenExpiration', expirationTime.toString())
+
         // Set authorization header
         setAuthToken(this.token)
+
+        // Start expiration check timer
+        this.startExpirationCheck()
 
         // Fetch user data
         await this.fetchUser()
@@ -70,16 +90,58 @@ export const useAuthStore = defineStore('auth', {
     logout() {
       this.user = null
       this.token = null
+      this.tokenExpiration = null
+      this.showExpirationWarning = false
       localStorage.removeItem('token')
+      localStorage.removeItem('tokenExpiration')
       setAuthToken(null)
       clearCache()
+      this.stopExpirationCheck()
     },
 
     async initializeAuth() {
       if (this.token) {
         setAuthToken(this.token)
+
+        // Check if token is expired
+        if (this.tokenExpiration && Date.now() >= this.tokenExpiration) {
+          console.log('Token expired, logging out')
+          this.logout()
+          return
+        }
+
         await this.fetchUser()
+        this.startExpirationCheck()
       }
+    },
+
+    startExpirationCheck() {
+      // Check every minute
+      this.expirationCheckInterval = setInterval(() => {
+        const expiresIn = this.tokenExpiresInMinutes
+
+        // Show warning 5 minutes before expiration
+        if (expiresIn <= 5 && expiresIn > 0) {
+          this.showExpirationWarning = true
+        }
+
+        // Auto-logout when expired
+        if (expiresIn <= 0 && this.token) {
+          console.log('Token expired, auto-logout')
+          this.logout()
+        }
+      }, 60000) // Check every minute
+    },
+
+    stopExpirationCheck() {
+      if (this.expirationCheckInterval) {
+        clearInterval(this.expirationCheckInterval)
+        this.expirationCheckInterval = null
+      }
+    },
+
+    dismissExpirationWarning() {
+      this.showExpirationWarning = false
     }
   }
 })
