@@ -196,6 +196,22 @@ Based on project requirements:
    - `vite.config.js`: Added `/ws` proxy with WebSocket support (ws: true)
    - `stores/websocket.js`: Changed URL from `${host}:8001` to `${host}` (uses current port)
 
+22. **Dashboard Interactive Stats Cards** (2025-10-01):
+   - ✅ Made all dashboard stat cards clickable with navigation
+   - ✅ Added visual icons to each card for better identification
+   - ✅ Hover effect for better UX indication
+   - ✅ Added Credentials count to dashboard
+   - **UX: 7/10 → 9/10**
+
+   **Changes:**
+   - `frontend/src/views/DashboardView.vue`:
+     - Added click handlers with router.push() to navigate to respective pages
+     - Added Material Design icons to each card (script, robot, calendar, key, chart)
+     - Added hover effect and cursor pointer
+     - Cards now navigate to: Scripts, Agents, Jobs, Credentials, Monitoring
+   - `frontend/src/services/api.js`: Added credentials API endpoints
+   - Dashboard now more interactive and user-friendly
+
 21. **Agent Logs Viewer Implementation** (2025-10-01):
    - ✅ Implemented fully functional agent logs viewer in monitoring page
    - ✅ Displays recent job executions for each agent (up to 5 per job)

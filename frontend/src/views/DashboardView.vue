@@ -8,51 +8,76 @@
 
     <v-row>
       <v-col cols="12" sm="6" md="4" lg="2-4">
-        <v-card>
+        <v-card hover @click="$router.push('/scripts')" style="cursor: pointer">
           <v-card-text>
-            <div class="text-h6">Scripts</div>
-            <div class="text-h4 text-primary" v-if="!loading">{{ stats.scripts }}</div>
-            <v-skeleton-loader v-else type="text" width="60"></v-skeleton-loader>
+            <div class="d-flex align-center justify-space-between">
+              <div>
+                <div class="text-h6">Scripts</div>
+                <div class="text-h4 text-primary" v-if="!loading">{{ stats.scripts }}</div>
+                <v-skeleton-loader v-else type="text" width="60"></v-skeleton-loader>
+              </div>
+              <v-icon size="40" color="primary">mdi-script-text</v-icon>
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
 
       <v-col cols="12" sm="6" md="4" lg="2-4">
-        <v-card>
+        <v-card hover @click="$router.push('/agents')" style="cursor: pointer">
           <v-card-text>
-            <div class="text-h6">Active Agents</div>
-            <div class="text-h4 text-success" v-if="!loading">{{ stats.activeAgents }}</div>
-            <v-skeleton-loader v-else type="text" width="60"></v-skeleton-loader>
+            <div class="d-flex align-center justify-space-between">
+              <div>
+                <div class="text-h6">Active Agents</div>
+                <div class="text-h4 text-success" v-if="!loading">{{ stats.activeAgents }}</div>
+                <v-skeleton-loader v-else type="text" width="60"></v-skeleton-loader>
+              </div>
+              <v-icon size="40" color="success">mdi-robot</v-icon>
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
 
       <v-col cols="12" sm="6" md="4" lg="2-4">
-        <v-card>
+        <v-card hover @click="$router.push('/jobs')" style="cursor: pointer">
           <v-card-text>
-            <div class="text-h6">Scheduled Jobs</div>
-            <div class="text-h4 text-info" v-if="!loading">{{ stats.scheduledJobs }}</div>
-            <v-skeleton-loader v-else type="text" width="60"></v-skeleton-loader>
+            <div class="d-flex align-center justify-space-between">
+              <div>
+                <div class="text-h6">Scheduled Jobs</div>
+                <div class="text-h4 text-info" v-if="!loading">{{ stats.scheduledJobs }}</div>
+                <v-skeleton-loader v-else type="text" width="60"></v-skeleton-loader>
+              </div>
+              <v-icon size="40" color="info">mdi-calendar-clock</v-icon>
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
 
       <v-col cols="12" sm="6" md="4" lg="2-4">
-        <v-card>
+        <v-card hover @click="$router.push('/credentials')" style="cursor: pointer">
           <v-card-text>
-            <div class="text-h6">Credentials</div>
-            <div class="text-h4 text-secondary" v-if="!loading">{{ stats.credentials }}</div>
-            <v-skeleton-loader v-else type="text" width="60"></v-skeleton-loader>
+            <div class="d-flex align-center justify-space-between">
+              <div>
+                <div class="text-h6">Credentials</div>
+                <div class="text-h4 text-secondary" v-if="!loading">{{ stats.credentials }}</div>
+                <v-skeleton-loader v-else type="text" width="60"></v-skeleton-loader>
+              </div>
+              <v-icon size="40" color="secondary">mdi-key</v-icon>
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
 
       <v-col cols="12" sm="6" md="4" lg="2-4">
-        <v-card>
+        <v-card hover @click="$router.push('/monitoring')" style="cursor: pointer">
           <v-card-text>
-            <div class="text-h6">Recent Executions</div>
-            <div class="text-h4 text-warning" v-if="!loading">{{ stats.recentExecutions }}</div>
-            <v-skeleton-loader v-else type="text" width="60"></v-skeleton-loader>
+            <div class="d-flex align-center justify-space-between">
+              <div>
+                <div class="text-h6">Recent Executions</div>
+                <div class="text-h4 text-warning" v-if="!loading">{{ stats.recentExecutions }}</div>
+                <v-skeleton-loader v-else type="text" width="60"></v-skeleton-loader>
+              </div>
+              <v-icon size="40" color="warning">mdi-chart-timeline-variant</v-icon>
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
