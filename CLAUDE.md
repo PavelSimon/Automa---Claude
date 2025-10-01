@@ -184,6 +184,16 @@ Based on project requirements:
 ## Recent Updates
 
 ### Phase 2: Stabilization - Token Warning & Docker Sandbox (2025-10-01 - Latest)
+18. **Added WebSocket Proxy Configuration**:
+   - ✅ Added `/ws` proxy route in vite.config.js for WebSocket support
+   - ✅ Configured WebSocket proxy with `ws: true` flag
+   - ✅ Resolves WebSocket connection failures to backend
+   - ✅ Enables real-time updates for agent status and job execution
+   - **Real-time Features: 0/10 → 8/10**
+
+   **Changes:**
+   - `vite.config.js`: Added `/ws` proxy with WebSocket support (ws: true)
+
 17. **Fixed Vuetify 3 Deprecation Warning in DashboardView**:
    - ✅ Removed deprecated `v-list-item-content` component
    - ✅ Updated to Vuetify 3 syntax with direct title/subtitle props
