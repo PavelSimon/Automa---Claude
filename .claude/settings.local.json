@@ -32,7 +32,9 @@
       "Bash(sudo usermod:*)",
       "Bash(docker build:*)",
       "Bash(git revert:*)",
-      "Bash(docker ps:*)"
+      "Bash(docker ps:*)",
+      "Read(//tmp/**)",
+      "Bash(pkill:*)"
     ],
     "deny": [],
     "ask": []

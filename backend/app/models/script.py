@@ -21,7 +21,7 @@ class Script(Base):
 
     # Relationships
     creator = relationship("User", backref="scripts")
-    agents = relationship("Agent", back_populates="script")
+    agents = relationship("Agent", back_populates="script", cascade="all, delete-orphan")
 
     @property
     def is_deleted(self):

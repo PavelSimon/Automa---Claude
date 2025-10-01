@@ -10,7 +10,7 @@ class Agent(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(255), nullable=False, index=True)
     description = Column(Text)
-    script_id = Column(Integer, ForeignKey("scripts.id"), nullable=False, index=True)
+    script_id = Column(Integer, ForeignKey("scripts.id", ondelete="CASCADE"), nullable=False, index=True)
     config_json = Column(JSON)
     is_active = Column(Boolean, default=True, index=True)
     status = Column(String(50), default="stopped", index=True)  # stopped, running, error

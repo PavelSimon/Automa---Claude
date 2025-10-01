@@ -13,7 +13,7 @@ class Job(Base):
     )
 
     id = Column(Integer, primary_key=True, index=True)
-    agent_id = Column(Integer, ForeignKey("agents.id"), nullable=False, index=True)
+    agent_id = Column(Integer, ForeignKey("agents.id", ondelete="CASCADE"), nullable=False, index=True)
     name = Column(String(255), nullable=False, index=True)
     schedule_type = Column(String(50), nullable=False, index=True)  # once, interval, cron
     cron_expression = Column(String(100))
@@ -28,7 +28,7 @@ class Job(Base):
     # Relationships
     agent = relationship("Agent", back_populates="jobs")
     creator = relationship("User", backref="jobs")
-    executions = relationship("JobExecution", back_populates="job")
+    executions = relationship("JobExecution", back_populates="job", cascade="all, delete-orphan")
 
     @property
     def is_deleted(self):
@@ -44,7 +44,7 @@ class JobExecution(Base):
     )
 
     id = Column(Integer, primary_key=True, index=True)
-    job_id = Column(Integer, ForeignKey("jobs.id"), nullable=False, index=True)
+    job_id = Column(Integer, ForeignKey("jobs.id", ondelete="CASCADE"), nullable=False, index=True)
     started_at = Column(DateTime(timezone=True), server_default=func.now(), index=True)
     finished_at = Column(DateTime(timezone=True))
     status = Column(String(50), nullable=False, index=True)  # running, success, failed, timeout
