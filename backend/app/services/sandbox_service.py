@@ -191,11 +191,11 @@ CMD ["python", "/app/script.py"]
             raise RuntimeError(f"Error starting agent container: {e}")
 
     @with_retry(max_retries=3, delay=1.0, exceptions=(docker.errors.APIError,))
-    async def stop_agent_container(self, container_id: str) -> None:
+    async def stop_agent_container(self, container_id: str, timeout: int = 10) -> None:
         """Stop and remove an agent container with retry logic"""
         try:
             container = self.docker_client.containers.get(container_id)
-            container.stop(timeout=10)
+            container.stop(timeout=timeout)
             container.remove()
         except docker.errors.NotFound:
             # Container already removed
@@ -227,3 +227,12 @@ CMD ["python", "/app/script.py"]
                 "logs": str(e),
                 "running": False
             }
+    async def list_agent_containers(self) -> list:
+        """List all running agent containers"""
+        try:
+            containers = self.docker_client.containers.list(
+                filters={"name": "automa_agent_*"}
+            )
+            return [{"id": c.id, "name": c.name, "status": c.status} for c in containers]
+        except Exception as e:
+            raise RuntimeError(f"Error listing agent containers: {e}")

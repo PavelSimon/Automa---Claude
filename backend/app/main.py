@@ -21,6 +21,7 @@ from .core.exceptions import (
 )
 from .services.scheduler_service import init_scheduler, shutdown_scheduler
 from .core.cache import close_redis
+from .core.shutdown import graceful_shutdown_agents
 
 # Initialize rate limiter
 limiter = Limiter(key_func=get_remote_address)
@@ -34,6 +35,7 @@ async def lifespan(app: FastAPI):
     yield
     # Shutdown
     shutdown_scheduler()
+    await graceful_shutdown_agents()
     await close_redis()
 
 

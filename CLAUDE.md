@@ -183,57 +183,8 @@ Based on project requirements:
 
 ## Recent Updates
 
-<<<<<<< HEAD
-### Phase 3: Performance Optimization (2025-09-30 - Latest)
-16. **Performance & Real-time Communication**:
-   - ✅ Implemented Redis cache layer with fallback support
-   - ✅ Added cache endpoints (/api/v1/monitoring/cache)
-   - ✅ Created WebSocket support for real-time updates
-   - ✅ WebSocket store for frontend with auto-reconnect
-   - ✅ Frontend virtual scrolling already implemented (v-data-table)
-   - ✅ All tests passing (13/13)
-   - **Performance: 6/10 → 8/10** | **Real-time capabilities: 0/10 → 9/10**
-
-   **Backend Changes:**
-   - `core/cache.py`: Redis cache decorator with TTL and automatic fallback
-   - `api/websocket.py`: WebSocket endpoint with connection manager
-   - `api/monitoring.py`: Added /cache and /cache/invalidate endpoints
-   - `config.py`: Added optional redis_url configuration
-   - `main.py`: Integrated WebSocket router and Redis cleanup on shutdown
-
-   **Frontend Changes:**
-   - `stores/websocket.js`: Pinia store for WebSocket management
-   - `App.vue`: Auto-connect WebSocket when authenticated
-   - Event-based architecture for agent/job/metrics updates
-
-   **Dependencies:**
-   - Added `redis[hiredis]>=5.0.0` for high-performance caching
-
-### Phase 2: Stabilization - Database Schema Migration (2025-09-30)
-15. **Database Schema Migration for Soft Delete**:
-   - ✅ Migrated existing database to add deleted_at columns
-   - ✅ Used Python sqlite3 to safely ALTER TABLE for scripts, agents, jobs
-   - ✅ Created indexes on deleted_at columns for query performance
-   - ✅ Verified backend starts successfully with new schema
-   - ✅ All tests passing (13/13)
-   - **Database Stability: 9/10 → 10/10** | **Schema Modernization: 8/10 → 10/10**
-
-   **Migration Script:**
-   ```python
-   # Manual migration via Python sqlite3 module:
-   # - ALTER TABLE scripts ADD COLUMN deleted_at TIMESTAMP
-   # - ALTER TABLE agents ADD COLUMN deleted_at TIMESTAMP
-   # - ALTER TABLE jobs ADD COLUMN deleted_at TIMESTAMP
-   # - CREATE INDEX ix_scripts_deleted_at ON scripts(deleted_at)
-   # - CREATE INDEX ix_agents_deleted_at ON agents(deleted_at)
-   # - CREATE INDEX ix_jobs_deleted_at ON jobs(deleted_at)
-   ```
-
-14. **Database & Performance Optimization** (2025-09-30):
-=======
 ### Phase 2: Stabilization - Database Optimization (2025-09-30 - Latest)
 14. **Database & Performance Optimization**:
->>>>>>> parent of ca177dc (Database schema migration: Add soft delete support)
    - ✅ Added composite indexes for frequently queried columns
    - ✅ Implemented soft delete pattern for critical entities (Script, Agent, Job)
    - ✅ Fixed CredentialDialog.vue initialization error

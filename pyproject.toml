@@ -30,6 +30,7 @@ dependencies = [
 dev = [
     "pytest>=7.4.3",
     "pytest-asyncio>=0.21.1",
+    "pytest-cov>=4.1.0",
     "httpx>=0.25.2",
     "ruff>=0.1.0",
 ]
@@ -38,8 +39,22 @@ dev = [
 dev = [
     "pytest>=7.4.3",
     "pytest-asyncio>=0.21.1",
+    "pytest-cov>=4.1.0",
     "httpx>=0.25.2",
     "ruff>=0.1.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["backend/tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+pythonpath = ["backend"]
+addopts = [
+    "--cov=app",
+    "--cov-report=html",
+    "--cov-report=term-missing",
+    "--cov-report=json",
+    "-v"
 ]
 
 [tool.uv.workspace]

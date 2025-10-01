@@ -30,7 +30,9 @@
       "Bash(npm run test:*)",
       "Bash(find:*)",
       "Bash(sudo usermod:*)",
-      "Bash(docker build:*)"
+      "Bash(docker build:*)",
+      "Bash(git revert:*)",
+      "Bash(docker ps:*)"
     ],
     "deny": [],
     "ask": []
