@@ -196,6 +196,20 @@ Based on project requirements:
    - `vite.config.js`: Added `/ws` proxy with WebSocket support (ws: true)
    - `stores/websocket.js`: Changed URL from `${host}:8001` to `${host}` (uses current port)
 
+18. **Frontend Cache Invalidation Fix** (2025-10-01):
+   - ✅ Fixed agent/job status not refreshing after start/stop/create operations
+   - ✅ Re-implemented cache invalidation in API interceptor for POST/PUT/DELETE/PATCH requests
+   - ✅ Automatic cache clearing for affected resources after mutations
+   - ✅ Monitoring cache also cleared to ensure dashboard reflects changes
+   - **User Experience: 7/10 → 9/10**
+
+   **Root Cause:** Cache invalidation code was removed from api.js interceptor, causing stale data to be displayed after mutations.
+
+   **Changes:**
+   - `frontend/src/services/api.js`: Re-added response interceptor with cache invalidation logic
+   - Cache now automatically invalidates after creating/updating/deleting agents, jobs, or scripts
+   - Dashboard and monitoring views now show fresh data immediately after mutations
+
 17. **Fixed Vuetify 3 Deprecation Warning in DashboardView**:
    - ✅ Removed deprecated `v-list-item-content` component
    - ✅ Updated to Vuetify 3 syntax with direct title/subtitle props

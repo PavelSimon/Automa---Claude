@@ -33,14 +33,31 @@ api.interceptors.request.use((config) => {
 // Response interceptor for caching and error handling
 api.interceptors.response.use(
   (response) => {
+    const method = response.config.method?.toLowerCase()
+
     // Cache successful GET responses
-    if (response.config.method === 'get') {
+    if (method === 'get') {
       const cacheKey = `${response.config.url}?${new URLSearchParams(response.config.params).toString()}`
       cache.set(cacheKey, {
         data: response,
         timestamp: Date.now()
       })
     }
+
+    // Invalidate cache after mutations (POST, PUT, DELETE, PATCH)
+    if (['post', 'put', 'delete', 'patch'].includes(method)) {
+      // Extract resource path from URL (e.g., /api/v1/agents/)
+      const url = response.config.url || ''
+      const resourceMatch = url.match(/\/api\/v1\/(\w+)/)
+      if (resourceMatch) {
+        const resource = resourceMatch[1]
+        // Clear all cached entries for this resource
+        clearCache(resource)
+        // Also clear monitoring cache as it depends on all resources
+        clearCache('monitoring')
+      }
+    }
+
     return response
   },
   (error) => {
