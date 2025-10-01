@@ -160,6 +160,15 @@ export const apiService = {
     executions: (limit) => api.get('/api/v1/monitoring/executions/recent', {
       params: limit ? { limit } : {}
     })
+  },
+
+  // Credentials
+  credentials: {
+    list: (skip = 0, limit = 100) => api.get('/api/v1/credentials/', { params: { skip, limit } }),
+    get: (id) => api.get(`/api/v1/credentials/${id}`),
+    create: (data) => api.post('/api/v1/credentials/', data),
+    update: (id, data) => api.put(`/api/v1/credentials/${id}`, data),
+    delete: (id) => api.delete(`/api/v1/credentials/${id}`)
   }
 }
 

@@ -7,7 +7,7 @@
     </v-row>
 
     <v-row>
-      <v-col cols="12" md="3">
+      <v-col cols="12" sm="6" md="4" lg="2-4">
         <v-card>
           <v-card-text>
             <div class="text-h6">Scripts</div>
@@ -17,7 +17,7 @@
         </v-card>
       </v-col>
 
-      <v-col cols="12" md="3">
+      <v-col cols="12" sm="6" md="4" lg="2-4">
         <v-card>
           <v-card-text>
             <div class="text-h6">Active Agents</div>
@@ -27,7 +27,7 @@
         </v-card>
       </v-col>
 
-      <v-col cols="12" md="3">
+      <v-col cols="12" sm="6" md="4" lg="2-4">
         <v-card>
           <v-card-text>
             <div class="text-h6">Scheduled Jobs</div>
@@ -37,7 +37,17 @@
         </v-card>
       </v-col>
 
-      <v-col cols="12" md="3">
+      <v-col cols="12" sm="6" md="4" lg="2-4">
+        <v-card>
+          <v-card-text>
+            <div class="text-h6">Credentials</div>
+            <div class="text-h4 text-secondary" v-if="!loading">{{ stats.credentials }}</div>
+            <v-skeleton-loader v-else type="text" width="60"></v-skeleton-loader>
+          </v-card-text>
+        </v-card>
+      </v-col>
+
+      <v-col cols="12" sm="6" md="4" lg="2-4">
         <v-card>
           <v-card-text>
             <div class="text-h6">Recent Executions</div>
@@ -99,6 +109,7 @@ const stats = ref({
   scripts: 0,
   activeAgents: 0,
   scheduledJobs: 0,
+  credentials: 0,
   recentExecutions: 0
 })
 
@@ -127,11 +138,16 @@ const loadDashboardData = async () => {
     const executionsResponse = await apiService.monitoring.executions()
     const executions = executionsResponse.data
 
+    // Load credentials count
+    const credentialsResponse = await apiService.credentials.list()
+    const credentials = credentialsResponse.data
+
     // Update stats
     stats.value = {
       scripts: scripts.length,
       activeAgents: activeAgents.length,
       scheduledJobs: activeJobs.length,
+      credentials: credentials.length,
       recentExecutions: executions.length
     }
 
